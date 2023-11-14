@@ -48,8 +48,7 @@ public class Gwiazda {
         if (masa >= 0.1 && masa <= 50) {
             this.masa = masa;
         } else {
-            throw new IllegalArgumentException("Nieprawidłowa masa gwiazdy.");
-        }
+            throw new IllegalArgumentException("Nieprawidłowa masa gwiazdy.");}
 
         // Obliczanie absolutnej wielkości gwiazdowej
         this.absolutnaWielkoscGwiazdowa = obserwowanaWielkoscGwiazdowa - 5 * (Math.log10(odlegloscWLatachSwietlnych) - 1) + 5;
