@@ -1,0 +1,2 @@
+Implementacja interfejsów:
+- zwrócić uwagę na ograniczenie przy dodawaniu nazwy do listy: żeby nowe nadpisywały stare etc. Póki co, nie ma tej implementacji

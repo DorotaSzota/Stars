@@ -1,4 +1,9 @@
-public class Gwiazda {
+import java.util.ArrayList;
+import java.util.List;
+
+public class Gwiazda implements IKolekcjaGwiazd {
+
+    private List<Gwiazda> gwiazdyList = new ArrayList<>();
     private String nazwa;
     private String nazwaKatalogowa;
     private String deklinacja;
@@ -65,6 +70,8 @@ public class Gwiazda {
         }
     }
 
+
+    //GETTERS & SETTERS
     public String getNazwaKatalogowa() {
         return nazwaKatalogowa;
     }
@@ -155,8 +162,110 @@ public class Gwiazda {
         if (masa >= 0.1 && masa <= 50) {
             this.masa = masa;
         } else {
-            throw new IllegalArgumentException("Nieprawidłowa masa gwiazdy.");
+            throw new IllegalArgumentException("Nieprawidłowa masa gwiazdy."); }
+    }
+
+    //IMPLEMENTACJA INTERFEJSU
+    @Override
+    public void dodajGwiazde(String nazwa, String nazwaKatalogowa, String deklinacja, String rektascensja,
+                             double obserwowanaWielkoscGwiazdowa, double odlegloscWLatachSwietlnych,
+                             String gwiazdozbior, String polkula, double temperatura, double masa) {
+        // Sprawdzenie czy istnieje gwiazda o podanej nazwie katalogowej
+        for (Gwiazda gwiazda : gwiazdyList) {
+            if (gwiazda.getNazwaKatalogowa().equals(nazwaKatalogowa)) {
+                throw new IllegalArgumentException("Gwiazda o podanej nazwie katalogowej już istnieje.");
+            }
+        }
+
+        // Dodanie nowej gwiazdy
+        Gwiazda nowaGwiazda = new Gwiazda(nazwa, nazwaKatalogowa, deklinacja, rektascensja,
+                obserwowanaWielkoscGwiazdowa, odlegloscWLatachSwietlnych, gwiazdozbior, polkula, temperatura, masa);
+        gwiazdyList.add(nowaGwiazda);
+
+        // Aktualizacja nazw katalogowych pozostałych gwiazd w tym samym gwiazdozbiorze
+        for (Gwiazda gwiazda : gwiazdyList) {
+            if (gwiazda != nowaGwiazda && gwiazda.getGwiazdozbior().equals(gwiazdozbior)) {
+                gwiazda.setNazwaKatalogowa("gamma " + gwiazdozbior);
+            }
         }
     }
 
+    @Override
+    public void usunGwiazde(String nazwaKatalogowa) {
+        Gwiazda gwiazdaToRemove = null;
+
+        // Znajdź gwiazdę do usunięcia
+        for (Gwiazda gwiazda : gwiazdyList) {
+            if (gwiazda.getNazwaKatalogowa().equals(nazwaKatalogowa)) {
+                gwiazdaToRemove = gwiazda;
+                break;
+            }
+        }
+
+        // Usuń gwiazdę
+        if (gwiazdaToRemove != null) {
+            gwiazdyList.remove(gwiazdaToRemove);
+
+            // Aktualizacja nazw katalogowych pozostałych gwiazd w tym samym gwiazdozbiorze
+            for (Gwiazda gwiazda : gwiazdyList) {
+                if (gwiazda.getGwiazdozbior().equals(gwiazdaToRemove.getGwiazdozbior())) {
+                    gwiazda.setNazwaKatalogowa("beta " + gwiazdaToRemove.getGwiazdozbior());
+                }
+            }
+        }
+    }
+
+    @Override
+    public void modyfikujGwiazde(String nazwaKatalogowa, String nowaNazwa, String nowaNazwaKatalogowa,
+                                 String nowaDeklinacja, String nowaRektascensja, double nowaObserwowanaWielkoscGwiazdowa,
+                                 double nowaOdlegloscWLatachSwietlnych, String nowyGwiazdozbior, String nowaPolkula,
+                                 double nowaTemperatura, double nowaMasa) {
+        // Znajdź gwiazdę do modyfikacji
+        for (Gwiazda gwiazda : gwiazdyList) {
+            if (gwiazda.getNazwaKatalogowa().equals(nazwaKatalogowa)) {
+                gwiazda.setNazwa(nowaNazwa);
+                gwiazda.setNazwaKatalogowa(nowaNazwaKatalogowa);
+                gwiazda.setDeklinacja(nowaDeklinacja);
+                gwiazda.setRektascensja(nowaRektascensja);
+                gwiazda.setObserwowanaWielkoscGwiazdowa(nowaObserwowanaWielkoscGwiazdowa);
+                gwiazda.setOdlegloscWLatachSwietlnych(nowaOdlegloscWLatachSwietlnych);
+                gwiazda.setGwiazdozbior(nowyGwiazdozbior);
+                gwiazda.setPolkula(nowaPolkula);
+                gwiazda.setTemperatura(nowaTemperatura);
+                gwiazda.setMasa(nowaMasa);
+
+                // Aktualizacja nazw katalogowych pozostałych gwiazd w tym samym gwiazdozbiorze
+                for (Gwiazda pozostalaGwiazda : gwiazdyList) {
+                    if (pozostalaGwiazda != gwiazda && pozostalaGwiazda.getGwiazdozbior().equals(gwiazda.getGwiazdozbior())) {
+                        pozostalaGwiazda.setNazwaKatalogowa("gamma " + gwiazda.getGwiazdozbior());
+                    }
+                }
+
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void wyswietlGwiazdy() {
+        for (Gwiazda gwiazda : gwiazdyList) {
+            System.out.println("Nazwa: " + gwiazda.getNazwa());
+            System.out.println("Nazwa Katalogowa: " + gwiazda.getNazwaKatalogowa());
+            System.out.println("Deklinacja: " + gwiazda.getDeklinacja());
+            System.out.println("Rektascensja: " + gwiazda.getRektascensja());
+            System.out.println("Obserwowana Wielkość Gwiazdowa: " + gwiazda.getObserwowanaWielkoscGwiazdowa());
+            System.out.println("Absolutna Wielkość Gwiazdowa: " + gwiazda.getAbsolutnaWielkoscGwiazdowa());
+            System.out.println("Odległość w Latach Świetlnych: " + gwiazda.getOdlegloscWLatachSwietlnych());
+            System.out.println("Gwiazdozbiór: " + gwiazda.getGwiazdozbior());
+            System.out.println("Półkula: " + gwiazda.getPolkula());
+            System.out.println("Temperatura: " + gwiazda.getTemperatura());
+            System.out.println("Masa: " + gwiazda.getMasa());
+            System.out.println("--------------");
+        }
+    }
 }
+
+
+
+
+
