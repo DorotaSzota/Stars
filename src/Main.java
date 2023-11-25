@@ -1,17 +1,26 @@
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 public class Main {
     public static void main(String[] args) {
-        // Press Alt+Enter with your caret at the highlighted text to see how
-        // IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+        // Tworzenie listy gwiazd
+        List<Gwiazda> gwiazdy = new ArrayList<>();
 
-        // Press Shift+F10 or click the green arrow button in the gutter to run the code.
-        for (int i = 1; i <= 5; i++) {
+        // Dodawanie gwiazd do listy (tu użyj wcześniej podanych przykładowych gwiazd)
 
-            // Press Shift+F9 to start debugging your code. We have set one breakpoint
-            // for you, but you can always add more by pressing Ctrl+F8.
-            System.out.println("i = " + i);
-        }
+        // Tworzenie obiektu Wyszukiwarka
+        Wyszukiwarka wyszukiwarka = new Wyszukiwarka(gwiazdy);
+
+        // Przykłady użycia metod wyszukiwania
+        List<Gwiazda> gwiazdyWGwiazdozbiorze = wyszukiwarka.wyszukajWGwiazdozbiorze("Orion");
+        List<Gwiazda> gwiazdyWOdleglosci = wyszukiwarka.wyszukajWOdleglosci(15.0);
+        List<Gwiazda> gwiazdyWTemperaturze = wyszukiwarka.wyszukajWTemperaturze(5500, 6000);
+        List<Gwiazda> gwiazdyWWielkosciGwiazdowej = wyszukiwarka.wyszukajWWielkosciGwiazdowej(-2.0, 0.0);
+        List<Gwiazda> gwiazdyWPolkuli = wyszukiwarka.wyszukajWPolkuli("PN");
+        List<Gwiazda> potencjalneSupernowe = wyszukiwarka.wyszukajPotencjalneSupernowe();
+
+        // Zapisywanie i wczytywanie danych z pliku
+        wyszukiwarka.zapiszDoPliku("gwiazdy.dat");
+        wyszukiwarka.wczytajZPliku("gwiazdy.dat");
     }
 }
