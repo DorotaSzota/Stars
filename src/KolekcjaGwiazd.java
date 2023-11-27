@@ -6,6 +6,8 @@ interface KolekcjaGwiazd {
                       double obserwowanaWielkoscGwiazdowa, double odlegloscWLatachSwietlnych,
                       String gwiazdozbior, String polkula, double temperatura, double masa);
 
+
+
     List<Gwiazda> usunGwiazde(String nazwaKatalogowa);
 
     void wyswietlGwiazdy();

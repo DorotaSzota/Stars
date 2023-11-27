@@ -5,3 +5,5 @@ Implementacja interfejsów:
 - dodać obsługę błędów przy pobieraniu nazw z listy
 - dodać enum z literami alfabetu greckiego i wprowadzić logikę, że przy dodawaniu gwiazdy, jeśli gwiazda w gwiazdozbiorze x świeci jaśniej niż obecna w nim już gwiazda o nazwie y to napisuje tę literę alfabetu
 - w wyszukiwarce może implementacja jakiegoś interfejsu za pomocą switch case, żeby użytkownik wybrał, po czym chce wyszukiwać
+
+- w dodaj gwiazdę dodać obsługę wpisywania danych rpzez użytkownika

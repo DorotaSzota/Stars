@@ -141,7 +141,7 @@ public class Gwiazda implements KolekcjaGwiazd {
         if (polkula.equals("PN") || polkula.equals("PD")) {
             this.polkula = polkula;
         } else {
-            throw new IllegalArgumentException("Nieprawidłowa wartość półkuli.");
+            throw new IllegalArgumentException("Nieprawidłowa wartość półkuli. Wybierz PN lub PD.");
         }
     }
 
@@ -206,7 +206,6 @@ public class Gwiazda implements KolekcjaGwiazd {
                 break;
             }
         }
-
         // Usuń gwiazdę
         if (gwiazdaToRemove != null) {
             gwiazdyList.remove(gwiazdaToRemove);
