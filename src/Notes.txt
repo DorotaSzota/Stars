@@ -1,6 +1,6 @@
-Implementacja interfejsów:
-- zwrócić uwagę na ograniczenie przy dodawaniu nazwy do listy: żeby nowe nadpisywały stare etc. Póki co, nie ma tej implementacji. dodaj przy setterze, żeby przy tworzeniu gwiazdy sama brała następnego enuma jeśli gwiazda o tej nazwie już istnieje w danym gwiazdozbioerze
 
-- dodać enum z literami alfabetu greckiego i wprowadzić logikę, że przy dodawaniu gwiazdy, jeśli gwiazda w gwiazdozbiorze x świeci jaśniej niż obecna w nim już gwiazda o nazwie y to napisuje tę literę alfabetu
-- w wyszukiwarce może implementacja jakiegoś interfejsu za pomocą switch case, żeby użytkownik wybrał, po czym chce wyszukiwać
+- zwrócić uwagę na ograniczenie przy dodawaniu nazwy do listy: żeby nowe nadpisywały stare etc. Póki co, nie ma tej implementacji. dodaj przy setterze, żeby przy tworzeniu gwiazdy sama brała następnego enuma jeśli gwiazda o tej nazwie już istnieje w danym gwiazdozbioerze
+- deklinacja do poprawienia
+
+- klasa gwiazdozbiór przechowująca informacje o gwiazdach, które do niego należą ???
 

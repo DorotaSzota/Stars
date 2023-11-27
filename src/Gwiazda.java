@@ -19,7 +19,7 @@ public class Gwiazda implements KolekcjaGwiazd {
     //KONSTRUKTOR
     public Gwiazda() {
     }
-    public Gwiazda(String nazwa, String nazwaKatalogowa, String deklinacja, String rektascensja,
+    public Gwiazda(String nazwa, String deklinacja, String rektascensja,
                    double obserwowanaWielkoscGwiazdowa, double odlegloscWLatachSwietlnych,
                    String gwiazdozbior, String polkula, double temperatura, double masa) {
         if (nazwa.matches("[A-Z]{3}\\d{4}")) {
@@ -28,7 +28,6 @@ public class Gwiazda implements KolekcjaGwiazd {
             throw new IllegalArgumentException("Nieprawidłowa nazwa gwiazdy.");
         }
 
-        this.nazwaKatalogowa = nazwaKatalogowa;
         this.deklinacja = deklinacja;
         this.rektascensja = rektascensja;
 
@@ -40,6 +39,7 @@ public class Gwiazda implements KolekcjaGwiazd {
 
         this.odlegloscWLatachSwietlnych = odlegloscWLatachSwietlnych;
         this.gwiazdozbior = gwiazdozbior;
+        generujNazweKatalogowa();
 
         if (polkula.equals("PN") || polkula.equals("PD")) {
             this.polkula = polkula;
@@ -78,11 +78,12 @@ public class Gwiazda implements KolekcjaGwiazd {
             throw new IllegalArgumentException("Nieprawidłowa nazwa gwiazdy.");
         }
     }
+    //nazwy katalogowej nie ma w konstruktorze, bo ona się utworzy automatycznie
     public String getNazwaKatalogowa() {
         return nazwaKatalogowa;
     }
 
-    //DO POPRAWIENIA
+    //DO POPRAWIENIA, czyli implementacja logiki dodawania alf i bet etc.
     public void setNazwaKatalogowa(String nazwaKatalogowa) {
         this.nazwaKatalogowa = nazwaKatalogowa;
     }
@@ -172,6 +173,27 @@ public class Gwiazda implements KolekcjaGwiazd {
             throw new IllegalArgumentException("Nieprawidłowa masa gwiazdy."); }
     }
 
+    //może tutaj można zrobić logikę przeszukiwania listy gwiazd i sprawdzania czy nazwa katalogowa już istnieje?
+    private void generujNazweKatalogowa() {
+        AlfabetGrecki[] alfabet = AlfabetGrecki.values();
+        boolean nazwaUnikalna = false;
+        int index = 0;
+
+        while (!nazwaUnikalna) {
+            if (index >= alfabet.length) {
+                this.nazwaKatalogowa = Integer.toString(index);
+                nazwaUnikalna = true;
+            } else {
+                this.nazwaKatalogowa = alfabet[index] + " " + gwiazdozbior;
+                if (czyNazwaKatalogowaJuzIstnieje()) {
+                    index++;
+                } else {
+                    nazwaUnikalna = true;
+                }
+            }
+        }
+    }
+
     //IMPLEMENTACJA INTERFEJSU
     @Override
     public void dodajGwiazde(List<Gwiazda> listaGwiazd, Gwiazda nowaGwiazda) {
@@ -193,15 +215,12 @@ public class Gwiazda implements KolekcjaGwiazd {
     @Override
     public void usunGwiazde(List<Gwiazda> gwiazdyList, String nazwaKatalogowa) {
         Gwiazda gwiazdaToRemove = null;
-
-        // Znajdź gwiazdę do usunięcia
         for (Gwiazda gwiazda : gwiazdyList) {
             if (gwiazda.getNazwaKatalogowa().equals(nazwaKatalogowa)) {
                 gwiazdaToRemove = gwiazda;
                 break;
             }
         }
-        // Usuń gwiazdę
         if (gwiazdaToRemove != null) {
             gwiazdyList.remove(gwiazdaToRemove);
 
