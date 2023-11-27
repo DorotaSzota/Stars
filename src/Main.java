@@ -1,15 +1,22 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+
 public class Main {
     public static void main(String[] args) {
-        // Tworzenie listy gwiazd
+
         List<Gwiazda> gwiazdy = new ArrayList<>();
 
-        // Dodawanie gwiazd do listy (tu użyj wcześniej podanych przykładowych gwiazd)
+        Gwiazda ALF1234 = new Gwiazda("ALF1234","alfa Orionis","12°34'56.78\"","05h36m24s",-5.0,10.5,"Orion","PN",5000,0.5);
+        Gwiazda BET5678 = new Gwiazda();
+
+
+        BET5678.dodajGwiazde("BET5678","beta Ursae Majoris","45°18'32.10\"","09h47m31s",-4.5,8.2,"Wielka Niedźwiedzica","PN",5100,1.0);
+
+
 
         // Tworzenie obiektu Wyszukiwarka
-        Wyszukiwarka wyszukiwarka = new Wyszukiwarka(gwiazdy);
+        WyszukiwarkaGwiazd wyszukiwarka = new WyszukiwarkaGwiazd(gwiazdy);
 
         // Przykłady użycia metod wyszukiwania
         List<Gwiazda> gwiazdyWGwiazdozbiorze = wyszukiwarka.wyszukajWGwiazdozbiorze("Orion");

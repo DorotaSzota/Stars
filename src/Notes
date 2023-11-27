@@ -1,2 +1,7 @@
 Implementacja interfejsów:
 - zwrócić uwagę na ograniczenie przy dodawaniu nazwy do listy: żeby nowe nadpisywały stare etc. Póki co, nie ma tej implementacji
+- dodać obsługę błędów przy dodawaniu nowych nazw do listy
+- dodać obsługę błędów przy usuwaniu nazw z listy
+- dodać obsługę błędów przy pobieraniu nazw z listy
+- dodać enum z literami alfabetu greckiego i wprowadzić logikę, że przy dodawaniu gwiazdy, jeśli gwiazda w gwiazdozbiorze x świeci jaśniej niż obecna w nim już gwiazda o nazwie y to napisuje tę literę alfabetu
+- w wyszukiwarce może implementacja jakiegoś interfejsu za pomocą switch case, żeby użytkownik wybrał, po czym chce wyszukiwać
