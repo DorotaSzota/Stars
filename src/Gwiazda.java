@@ -64,6 +64,9 @@ public class Gwiazda implements KolekcjaGwiazd {
 
 
     //GETTERS & SETTERS
+    public List<Gwiazda> getGwiazdyList() {
+        return gwiazdyList;
+    }
     public String getNazwa() {
         return nazwa;
     }
@@ -79,6 +82,7 @@ public class Gwiazda implements KolekcjaGwiazd {
         return nazwaKatalogowa;
     }
 
+    //DO POPRAWIENIA
     public void setNazwaKatalogowa(String nazwaKatalogowa) {
         this.nazwaKatalogowa = nazwaKatalogowa;
     }
@@ -170,33 +174,24 @@ public class Gwiazda implements KolekcjaGwiazd {
 
     //IMPLEMENTACJA INTERFEJSU
     @Override
-    public void dodajGwiazde(String nazwa, String nazwaKatalogowa, String deklinacja, String rektascensja,
-                             double obserwowanaWielkoscGwiazdowa, double odlegloscWLatachSwietlnych,
-                             String gwiazdozbior, String polkula, double temperatura, double masa) {
-
-        // Spr. czy istnieje gwiazda o podanej nazwie katalogowej
-        for (Gwiazda gwiazda : gwiazdyList) {
-            if (gwiazda.getNazwaKatalogowa().equals(nazwaKatalogowa)) {
+    public void dodajGwiazde(List<Gwiazda> listaGwiazd, Gwiazda nowaGwiazda) {
+        for (Gwiazda gwiazda : listaGwiazd) {
+            if (gwiazda.getNazwaKatalogowa().equals(nowaGwiazda.getNazwaKatalogowa())) {
                 throw new IllegalArgumentException("Gwiazda o podanej nazwie katalogowej już istnieje.");
             }
         }
+        listaGwiazd.add(nowaGwiazda);
 
-        // Dodanie nowej gwiazdy
-        Gwiazda nowaGwiazda = new Gwiazda(nazwa, nazwaKatalogowa, deklinacja, rektascensja,
-                obserwowanaWielkoscGwiazdowa, odlegloscWLatachSwietlnych, gwiazdozbior, polkula, temperatura, masa);
-        gwiazdyList.add(nowaGwiazda);
-
-        // Aktualizacja nazw katalogowych pozostałych gwiazd w tym samym gwiazdozbiorze
-        for (Gwiazda gwiazda : gwiazdyList) {
-            if (gwiazda != nowaGwiazda && gwiazda.getGwiazdozbior().equals(gwiazdozbior)) {
-                gwiazda.setNazwaKatalogowa("gamma " + gwiazdozbior);
+        //DO POPRAWIENIA
+        for (Gwiazda gwiazda : listaGwiazd) {
+            if (gwiazda != nowaGwiazda && gwiazda.getGwiazdozbior().equals(nowaGwiazda.getGwiazdozbior())) {
+                gwiazda.setNazwaKatalogowa("gamma " + gwiazda.getGwiazdozbior());
             }
         }
-
     }
 
     @Override
-    public List<Gwiazda> usunGwiazde(String nazwaKatalogowa) {
+    public void usunGwiazde(List<Gwiazda> gwiazdyList, String nazwaKatalogowa) {
         Gwiazda gwiazdaToRemove = null;
 
         // Znajdź gwiazdę do usunięcia
@@ -211,19 +206,21 @@ public class Gwiazda implements KolekcjaGwiazd {
             gwiazdyList.remove(gwiazdaToRemove);
 
             // Aktualizacja nazw katalogowych pozostałych gwiazd w tym samym gwiazdozbiorze
+            //DO POPRAWIENIA
             for (Gwiazda gwiazda : gwiazdyList) {
                 if (gwiazda.getGwiazdozbior().equals(gwiazdaToRemove.getGwiazdozbior())) {
                     gwiazda.setNazwaKatalogowa("beta " + gwiazdaToRemove.getGwiazdozbior());
                 }
             }
         }
-        return gwiazdyList;
+
     }
 
-
     @Override
-    public void wyswietlGwiazdy() {
-        for (Gwiazda gwiazda : gwiazdyList) {
+    public void wyswietlGwiazdy(List<Gwiazda> gwiazdyList) {
+        for (int i = 0; i < gwiazdyList.size(); i++) {
+            Gwiazda gwiazda = gwiazdyList.get(i);
+            System.out.println("Gwiazda " + (i + 1) + ":");
             System.out.println("Nazwa: " + gwiazda.getNazwa());
             System.out.println("Nazwa Katalogowa: " + gwiazda.getNazwaKatalogowa());
             System.out.println("Deklinacja: " + gwiazda.getDeklinacja());

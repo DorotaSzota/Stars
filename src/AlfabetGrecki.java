@@ -1,26 +1,3 @@
 public enum AlfabetGrecki {
-    alpha,
-    beta,
-    gamma,
-    delta,
-    epsilon,
-    zeta,
-    eta,
-    theta,
-    iota,
-    kappa,
-    lambda,
-    mu,
-    nu,
-    xi,
-    omicron,
-    pi,
-    rho,
-    sigma,
-    tau,
-    upsilon,
-    phi,
-    chi,
-    psi,
-    omega
+ALFA, BETA, GAMMA, DELTA, EPSILON, ZETA, ETA, THETA, IOTA, KAPPA, LAMBDA, MI, NI, KSI, OMICRON, PI, RO, SIGMA, TAU, UPSILON, FI, CHI, PSI, OMEGA
 }

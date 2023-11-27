@@ -2,13 +2,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 interface KolekcjaGwiazd {
-     void dodajGwiazde(String nazwa, String nazwaKatalogowa, String deklinacja, String rektascensja,
-                      double obserwowanaWielkoscGwiazdowa, double odlegloscWLatachSwietlnych,
-                      String gwiazdozbior, String polkula, double temperatura, double masa);
+     void dodajGwiazde(List<Gwiazda> lista,Gwiazda obj);
 
 
 
-    List<Gwiazda> usunGwiazde(String nazwaKatalogowa);
+    void usunGwiazde(List<Gwiazda> gwiazdyList, String nazwaKatalogowa);
 
-    void wyswietlGwiazdy();
+    void wyswietlGwiazdy(List<Gwiazda> gwiazdyList);
 }
