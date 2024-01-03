@@ -22,12 +22,8 @@ public class Gwiazda implements KolekcjaGwiazd {
     public Gwiazda(String nazwa, String deklinacja, String rektascensja,
                    double obserwowanaWielkoscGwiazdowa, double odlegloscWLatachSwietlnych,
                    String gwiazdozbior, String polkula, double temperatura, double masa) {
-        if (nazwa.matches("[A-Z]{3}\\d{4}")) {
-            this.nazwa = nazwa;
-        } else {
-            throw new IllegalArgumentException("Nieprawidłowa nazwa gwiazdy.");
-        }
 
+        this.nazwa = nazwa;
         this.deklinacja = deklinacja;
         this.rektascensja = rektascensja;
 
