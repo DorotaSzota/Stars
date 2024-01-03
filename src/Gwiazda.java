@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Gwiazda implements IKolekcjaGwiazd {
+public class Gwiazda implements KolekcjaGwiazd {
 
     private List<Gwiazda> gwiazdyList = new ArrayList<>();
     private String nazwa;
@@ -16,7 +16,10 @@ public class Gwiazda implements IKolekcjaGwiazd {
     private double temperatura;
     private double masa;
 
-    public Gwiazda(String nazwa, String nazwaKatalogowa, String deklinacja, String rektascensja,
+    //KONSTRUKTOR
+    public Gwiazda() {
+    }
+    public Gwiazda(String nazwa, String deklinacja, String rektascensja,
                    double obserwowanaWielkoscGwiazdowa, double odlegloscWLatachSwietlnych,
                    String gwiazdozbior, String polkula, double temperatura, double masa) {
         if (nazwa.matches("[A-Z]{3}\\d{4}")) {
@@ -25,7 +28,6 @@ public class Gwiazda implements IKolekcjaGwiazd {
             throw new IllegalArgumentException("Nieprawidłowa nazwa gwiazdy.");
         }
 
-        this.nazwaKatalogowa = nazwaKatalogowa;
         this.deklinacja = deklinacja;
         this.rektascensja = rektascensja;
 
@@ -37,6 +39,7 @@ public class Gwiazda implements IKolekcjaGwiazd {
 
         this.odlegloscWLatachSwietlnych = odlegloscWLatachSwietlnych;
         this.gwiazdozbior = gwiazdozbior;
+        generujNazweKatalogowa();
 
         if (polkula.equals("PN") || polkula.equals("PD")) {
             this.polkula = polkula;
@@ -58,6 +61,12 @@ public class Gwiazda implements IKolekcjaGwiazd {
         // Obliczanie absolutnej wielkości gwiazdowej
         this.absolutnaWielkoscGwiazdowa = obserwowanaWielkoscGwiazdowa - 5 * (Math.log10(odlegloscWLatachSwietlnych) - 1) + 5;
     }
+
+
+    //GETTERS & SETTERS
+    public List<Gwiazda> getGwiazdyList() {
+        return gwiazdyList;
+    }
     public String getNazwa() {
         return nazwa;
     }
@@ -69,13 +78,12 @@ public class Gwiazda implements IKolekcjaGwiazd {
             throw new IllegalArgumentException("Nieprawidłowa nazwa gwiazdy.");
         }
     }
-
-
-    //GETTERS & SETTERS
+    //nazwy katalogowej nie ma w konstruktorze, bo ona się utworzy automatycznie
     public String getNazwaKatalogowa() {
         return nazwaKatalogowa;
     }
 
+    //DO POPRAWIENIA, czyli implementacja logiki dodawania alf i bet etc.
     public void setNazwaKatalogowa(String nazwaKatalogowa) {
         this.nazwaKatalogowa = nazwaKatalogowa;
     }
@@ -138,7 +146,7 @@ public class Gwiazda implements IKolekcjaGwiazd {
         if (polkula.equals("PN") || polkula.equals("PD")) {
             this.polkula = polkula;
         } else {
-            throw new IllegalArgumentException("Nieprawidłowa wartość półkuli.");
+            throw new IllegalArgumentException("Nieprawidłowa wartość półkuli. Wybierz PN lub PD.");
         }
     }
 
@@ -165,90 +173,73 @@ public class Gwiazda implements IKolekcjaGwiazd {
             throw new IllegalArgumentException("Nieprawidłowa masa gwiazdy."); }
     }
 
+    //może tutaj można zrobić logikę przeszukiwania listy gwiazd i sprawdzania czy nazwa katalogowa już istnieje?
+    private void generujNazweKatalogowa() {
+        AlfabetGrecki[] alfabet = AlfabetGrecki.values();
+        boolean nazwaUnikalna = false;
+        int index = 0;
+
+        while (!nazwaUnikalna) {
+            if (index >= alfabet.length) {
+                this.nazwaKatalogowa = Integer.toString(index);
+                nazwaUnikalna = true;
+            } else {
+                this.nazwaKatalogowa = alfabet[index] + " " + gwiazdozbior;
+                if (czyNazwaKatalogowaJuzIstnieje()) {
+                    index++;
+                } else {
+                    nazwaUnikalna = true;
+                }
+            }
+        }
+    }
+
     //IMPLEMENTACJA INTERFEJSU
     @Override
-    public void dodajGwiazde(String nazwa, String nazwaKatalogowa, String deklinacja, String rektascensja,
-                             double obserwowanaWielkoscGwiazdowa, double odlegloscWLatachSwietlnych,
-                             String gwiazdozbior, String polkula, double temperatura, double masa) {
-        // Sprawdzenie czy istnieje gwiazda o podanej nazwie katalogowej
-        for (Gwiazda gwiazda : gwiazdyList) {
-            if (gwiazda.getNazwaKatalogowa().equals(nazwaKatalogowa)) {
+    public void dodajGwiazde(List<Gwiazda> listaGwiazd, Gwiazda nowaGwiazda) {
+        for (Gwiazda gwiazda : listaGwiazd) {
+            if (gwiazda.getNazwaKatalogowa().equals(nowaGwiazda.getNazwaKatalogowa())) {
                 throw new IllegalArgumentException("Gwiazda o podanej nazwie katalogowej już istnieje.");
             }
         }
+        listaGwiazd.add(nowaGwiazda);
 
-        // Dodanie nowej gwiazdy
-        Gwiazda nowaGwiazda = new Gwiazda(nazwa, nazwaKatalogowa, deklinacja, rektascensja,
-                obserwowanaWielkoscGwiazdowa, odlegloscWLatachSwietlnych, gwiazdozbior, polkula, temperatura, masa);
-        gwiazdyList.add(nowaGwiazda);
-
-        // Aktualizacja nazw katalogowych pozostałych gwiazd w tym samym gwiazdozbiorze
-        for (Gwiazda gwiazda : gwiazdyList) {
-            if (gwiazda != nowaGwiazda && gwiazda.getGwiazdozbior().equals(gwiazdozbior)) {
-                gwiazda.setNazwaKatalogowa("gamma " + gwiazdozbior);
+        //DO POPRAWIENIA
+        for (Gwiazda gwiazda : listaGwiazd) {
+            if (gwiazda != nowaGwiazda && gwiazda.getGwiazdozbior().equals(nowaGwiazda.getGwiazdozbior())) {
+                gwiazda.setNazwaKatalogowa("gamma " + gwiazda.getGwiazdozbior());
             }
         }
     }
 
     @Override
-    public void usunGwiazde(String nazwaKatalogowa) {
+    public void usunGwiazde(List<Gwiazda> gwiazdyList, String nazwaKatalogowa) {
         Gwiazda gwiazdaToRemove = null;
-
-        // Znajdź gwiazdę do usunięcia
         for (Gwiazda gwiazda : gwiazdyList) {
             if (gwiazda.getNazwaKatalogowa().equals(nazwaKatalogowa)) {
                 gwiazdaToRemove = gwiazda;
                 break;
             }
         }
-
-        // Usuń gwiazdę
         if (gwiazdaToRemove != null) {
             gwiazdyList.remove(gwiazdaToRemove);
 
             // Aktualizacja nazw katalogowych pozostałych gwiazd w tym samym gwiazdozbiorze
+            //DO POPRAWIENIA
             for (Gwiazda gwiazda : gwiazdyList) {
                 if (gwiazda.getGwiazdozbior().equals(gwiazdaToRemove.getGwiazdozbior())) {
                     gwiazda.setNazwaKatalogowa("beta " + gwiazdaToRemove.getGwiazdozbior());
                 }
             }
         }
+
     }
 
     @Override
-    public void modyfikujGwiazde(String nazwaKatalogowa, String nowaNazwa, String nowaNazwaKatalogowa,
-                                 String nowaDeklinacja, String nowaRektascensja, double nowaObserwowanaWielkoscGwiazdowa,
-                                 double nowaOdlegloscWLatachSwietlnych, String nowyGwiazdozbior, String nowaPolkula,
-                                 double nowaTemperatura, double nowaMasa) {
-        // Znajdź gwiazdę do modyfikacji
-        for (Gwiazda gwiazda : gwiazdyList) {
-            if (gwiazda.getNazwaKatalogowa().equals(nazwaKatalogowa)) {
-                gwiazda.setNazwa(nowaNazwa);
-                gwiazda.setNazwaKatalogowa(nowaNazwaKatalogowa);
-                gwiazda.setDeklinacja(nowaDeklinacja);
-                gwiazda.setRektascensja(nowaRektascensja);
-                gwiazda.setObserwowanaWielkoscGwiazdowa(nowaObserwowanaWielkoscGwiazdowa);
-                gwiazda.setOdlegloscWLatachSwietlnych(nowaOdlegloscWLatachSwietlnych);
-                gwiazda.setGwiazdozbior(nowyGwiazdozbior);
-                gwiazda.setPolkula(nowaPolkula);
-                gwiazda.setTemperatura(nowaTemperatura);
-                gwiazda.setMasa(nowaMasa);
-
-                // Aktualizacja nazw katalogowych pozostałych gwiazd w tym samym gwiazdozbiorze
-                for (Gwiazda pozostalaGwiazda : gwiazdyList) {
-                    if (pozostalaGwiazda != gwiazda && pozostalaGwiazda.getGwiazdozbior().equals(gwiazda.getGwiazdozbior())) {
-                        pozostalaGwiazda.setNazwaKatalogowa("gamma " + gwiazda.getGwiazdozbior());
-                    }
-                }
-
-                break;
-            }
-        }
-    }
-
-    @Override
-    public void wyswietlGwiazdy() {
-        for (Gwiazda gwiazda : gwiazdyList) {
+    public void wyswietlGwiazdy(List<Gwiazda> gwiazdyList) {
+        for (int i = 0; i < gwiazdyList.size(); i++) {
+            Gwiazda gwiazda = gwiazdyList.get(i);
+            System.out.println("Gwiazda " + (i + 1) + ":");
             System.out.println("Nazwa: " + gwiazda.getNazwa());
             System.out.println("Nazwa Katalogowa: " + gwiazda.getNazwaKatalogowa());
             System.out.println("Deklinacja: " + gwiazda.getDeklinacja());

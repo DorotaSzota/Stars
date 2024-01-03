@@ -1,17 +1,21 @@
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Main {
     public static void main(String[] args) {
-        // Press Alt+Enter with your caret at the highlighted text to see how
-        // IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
 
-        // Press Shift+F10 or click the green arrow button in the gutter to run the code.
-        for (int i = 1; i <= 5; i++) {
+        List<Gwiazda> gwiazdy = new ArrayList<>();
+        Gwiazda PAP0666 = new Gwiazda("BET5678","12°34'56.78\"","05h36m24s",-5.0,10.5,"Orion","PN",5000,0.5);
+        Gwiazda HAH2137 = new Gwiazda("ALF1234","12°34'56.78\"","05h36m24s",-5.0,10.5,"Orion","PN",5000,0.5);
+        Gwiazda ELO9012 = new Gwiazda("ELO9012","12°34'56.78\"","06h36m24s",-2.0,11.5,"Orion","PN",5500,0.2);
 
-            // Press Shift+F9 to start debugging your code. We have set one breakpoint
-            // for you, but you can always add more by pressing Ctrl+F8.
-            System.out.println("i = " + i);
-        }
+        PAP0666.dodajGwiazde(gwiazdy,PAP0666);
+        HAH2137.dodajGwiazde(gwiazdy,HAH2137);
+        ELO9012.dodajGwiazde(gwiazdy,ELO9012);
+
+        gwiazdy.get(0).wyswietlGwiazdy(gwiazdy); //get(0) - pierwszy element listy
+
+
     }
 }
