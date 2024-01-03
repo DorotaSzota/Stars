@@ -26,13 +26,7 @@ public class Gwiazda implements KolekcjaGwiazd {
         this.nazwa = nazwa;
         this.deklinacja = deklinacja;
         this.rektascensja = rektascensja;
-
-        if (obserwowanaWielkoscGwiazdowa >= -26.74 && obserwowanaWielkoscGwiazdowa <= 15.00) {
-            this.obserwowanaWielkoscGwiazdowa = obserwowanaWielkoscGwiazdowa;
-        } else {
-            throw new IllegalArgumentException("Nieprawidłowa wartość obserwowanej wielkości gwiazdowej.");
-        }
-
+        this.obserwowanaWielkoscGwiazdowa = obserwowanaWielkoscGwiazdowa;
         this.odlegloscWLatachSwietlnych = odlegloscWLatachSwietlnych;
         this.gwiazdozbior = gwiazdozbior;
         generujNazweKatalogowa();
