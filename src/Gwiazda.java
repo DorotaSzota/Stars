@@ -29,24 +29,10 @@ public class Gwiazda implements KolekcjaGwiazd {
         this.obserwowanaWielkoscGwiazdowa = obserwowanaWielkoscGwiazdowa;
         this.odlegloscWLatachSwietlnych = odlegloscWLatachSwietlnych;
         this.gwiazdozbior = gwiazdozbior;
+        this.polkula = polkula;
+        this.temperatura = temperatura;
+        this.masa = masa;
         generujNazweKatalogowa();
-
-        if (polkula.equals("PN") || polkula.equals("PD")) {
-            this.polkula = polkula;
-        } else {
-            throw new IllegalArgumentException("Nieprawidłowa wartość półkuli.");
-        }
-
-        if (temperatura >= 2000) {
-            this.temperatura = temperatura;
-        } else {
-            throw new IllegalArgumentException("Nieprawidłowa temperatura gwiazdy.");
-        }
-
-        if (masa >= 0.1 && masa <= 50) {
-            this.masa = masa;
-        } else {
-            throw new IllegalArgumentException("Nieprawidłowa masa gwiazdy.");}
     }
 
 
@@ -137,7 +123,8 @@ public class Gwiazda implements KolekcjaGwiazd {
     }
 
     public void setAbsolutnaWielkoscGwiazdowa(double absolutnaWielkoscGwiazdowa) {
-        this.absolutnaWielkoscGwiazdowa = obserwowanaWielkoscGwiazdowa - 5 * (Math.log10(odlegloscWLatachSwietlnych)) + 5;
+        double odlegloscWParsekach = odlegloscWLatachSwietlnych * 3.26156;
+        this.absolutnaWielkoscGwiazdowa = (obserwowanaWielkoscGwiazdowa - (5 * (Math.log10(odlegloscWParsekach)))) + 5;
     }
 
     public double getOdlegloscWLatachSwietlnych() {
@@ -146,8 +133,6 @@ public class Gwiazda implements KolekcjaGwiazd {
 
     public void setOdlegloscWLatachSwietlnych(double odlegloscWLatachSwietlnych) {
         this.odlegloscWLatachSwietlnych = odlegloscWLatachSwietlnych;
-        // ponowne obliczenie absolutnej wielkości gwiazdowej przy zmianie odległości
-        this.absolutnaWielkoscGwiazdowa = obserwowanaWielkoscGwiazdowa - 5 * (Math.log10(odlegloscWLatachSwietlnych) - 1) + 5;
     }
 
     public String getGwiazdozbior() {
@@ -187,7 +172,8 @@ public class Gwiazda implements KolekcjaGwiazd {
     }
 
     public void setMasa(double masa) {
-        if (masa >= 0.1 && masa <= 50) {
+        double masaSlonca = 1.9891 * Math.pow(10, 30);
+        if (masa >= (0.1 * masaSlonca) && masa <= (50 * masaSlonca)) {
             this.masa = masa;
         } else {
             throw new IllegalArgumentException("Nieprawidłowa masa gwiazdy."); }
