@@ -47,9 +47,6 @@ public class Gwiazda implements KolekcjaGwiazd {
             this.masa = masa;
         } else {
             throw new IllegalArgumentException("Nieprawidłowa masa gwiazdy.");}
-
-        // Obliczanie absolutnej wielkości gwiazdowej
-        this.absolutnaWielkoscGwiazdowa = obserwowanaWielkoscGwiazdowa - 5 * (Math.log10(odlegloscWLatachSwietlnych) - 1) + 5;
     }
 
 
@@ -83,7 +80,23 @@ public class Gwiazda implements KolekcjaGwiazd {
     }
 
     public void setDeklinacja(String deklinacja) {
-        this.deklinacja = deklinacja;
+        if (deklinacja.matches("-?\\d{1,2}°\\d{1,2}'\\d{1,2}\\.?\\d{0,2}\"")) {
+            int stopnie = Integer.parseInt(deklinacja.substring(0, deklinacja.indexOf("°")));
+            int minuty = Integer.parseInt(deklinacja.substring(deklinacja.indexOf("°") + 1, deklinacja.indexOf("'")));
+            double sekundy = Integer.parseInt(deklinacja.substring(deklinacja.indexOf("'") + 1, deklinacja.indexOf("\"")));
+            if ((stopnie > -90 && stopnie < 90 && minuty >= 0 && minuty <= 59 && sekundy >= 0 && sekundy <= 59.99) ||
+                    (stopnie == 90 && minuty == 0 && sekundy == 0) || (stopnie == -90 && minuty == 0 && sekundy == 0)) {
+                if ((stopnie < 0 && polkula.equals("PD")) || (stopnie >= 0 && polkula.equals("PN"))){
+                    this.deklinacja = deklinacja;
+                } else {
+                    throw new IllegalArgumentException("Nieprawidłowa półkula.");
+                }
+            } else {
+                throw new IllegalArgumentException("Nieprawidłowa wartość deklinacji.");
+            }
+        } else {
+            throw new IllegalArgumentException("Nieprawidłowa wartość deklinacji.");
+        }
     }
 
     public String getRektascensja() {
@@ -91,7 +104,20 @@ public class Gwiazda implements KolekcjaGwiazd {
     }
 
     public void setRektascensja(String rektascensja) {
-        this.rektascensja = rektascensja;
+
+        if (rektascensja.matches("\\d{1,2}h\\d{1,2}m\\d{1,2}s")) {
+            int godziny = Integer.parseInt(rektascensja.substring(0, rektascensja.indexOf("h")));
+            int minuty = Integer.parseInt(rektascensja.substring(rektascensja.indexOf("h") + 1, rektascensja.indexOf("m")));
+            int sekundy = Integer.parseInt(rektascensja.substring(rektascensja.indexOf("m") + 1, rektascensja.indexOf("s")));
+            if ((godziny >= 0 && godziny <= 23 && minuty >= 0 && minuty <= 59 && sekundy >= 0 && sekundy <= 59) ||
+                    (godziny == 24 && minuty == 0 && sekundy == 0)) {
+                this.rektascensja = rektascensja;
+            } else {
+                throw new IllegalArgumentException("Nieprawidłowa wartość rektascensji.");
+            }
+        } else {
+            throw new IllegalArgumentException("Nieprawidłowa wartość rektascensji.");
+        }
     }
 
     public double getObserwowanaWielkoscGwiazdowa() {
@@ -108,6 +134,10 @@ public class Gwiazda implements KolekcjaGwiazd {
 
     public double getAbsolutnaWielkoscGwiazdowa() {
         return absolutnaWielkoscGwiazdowa;
+    }
+
+    public void setAbsolutnaWielkoscGwiazdowa(double absolutnaWielkoscGwiazdowa) {
+        this.absolutnaWielkoscGwiazdowa = obserwowanaWielkoscGwiazdowa - 5 * (Math.log10(odlegloscWLatachSwietlnych) - 1) + 5;
     }
 
     public double getOdlegloscWLatachSwietlnych() {
