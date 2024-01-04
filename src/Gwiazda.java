@@ -32,7 +32,7 @@ public class Gwiazda implements KolekcjaGwiazd {
         this.polkula = polkula;
         this.temperatura = temperatura;
         this.masa = masa;
-        generujNazweKatalogowa();
+        generujNazweKatalogowa(); //czy tu nie powinno być this.nazwaKatalogowa = generujNazweKatalogowa(); ?
     }
 
 
@@ -180,25 +180,45 @@ public class Gwiazda implements KolekcjaGwiazd {
     }
 
     //może tutaj można zrobić logikę przeszukiwania listy gwiazd i sprawdzania czy nazwa katalogowa już istnieje?
+    private boolean czyNazwaKatalogowaJuzIstnieje() {
+        for (Gwiazda gwiazda : gwiazdyList) {
+            if (gwiazda.getNazwaKatalogowa().equals(this.nazwaKatalogowa)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void generujNazweKatalogowa() {
         AlfabetGrecki[] alfabet = AlfabetGrecki.values();
-        boolean nazwaUnikalna = false;
-        int index = 0;
-
-        while (!nazwaUnikalna) {
-            if (index >= alfabet.length) {
-                this.nazwaKatalogowa = Integer.toString(index);
-                nazwaUnikalna = true;
-            } else {
-                this.nazwaKatalogowa = alfabet[index] + " " + gwiazdozbior;
-                if (czyNazwaKatalogowaJuzIstnieje()) {
-                    index++;
-                } else {
-                    nazwaUnikalna = true;
-                }
+        for (int i = 0; i < alfabet.length; i++) {
+            this.nazwaKatalogowa = alfabet[i] + " " + gwiazdozbior;
+            if (!czyNazwaKatalogowaJuzIstnieje()) {
+                return;
             }
         }
     }
+
+
+//    private void generujNazweKatalogowa() {
+//        AlfabetGrecki[] alfabet = AlfabetGrecki.values();
+//        boolean nazwaUnikalna = false;
+//        int index = 0;
+//
+//        while (!nazwaUnikalna) {
+//            if (index >= alfabet.length) {
+//                this.nazwaKatalogowa = Integer.toString(index);
+//                nazwaUnikalna = true;
+//            } else {
+//                this.nazwaKatalogowa = alfabet[index] + " " + gwiazdozbior;
+//                if (!czyNazwaKatalogowaJuzIstnieje()) {
+//                    index++;
+//                } else {
+//                    nazwaUnikalna = true;
+//                }
+//            }
+//        }
+//    }
 
     //IMPLEMENTACJA INTERFEJSU
     @Override
