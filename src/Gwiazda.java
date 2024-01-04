@@ -137,7 +137,7 @@ public class Gwiazda implements KolekcjaGwiazd {
     }
 
     public void setAbsolutnaWielkoscGwiazdowa(double absolutnaWielkoscGwiazdowa) {
-        this.absolutnaWielkoscGwiazdowa = obserwowanaWielkoscGwiazdowa - 5 * (Math.log10(odlegloscWLatachSwietlnych) - 1) + 5;
+        this.absolutnaWielkoscGwiazdowa = obserwowanaWielkoscGwiazdowa - 5 * (Math.log10(odlegloscWLatachSwietlnych)) + 5;
     }
 
     public double getOdlegloscWLatachSwietlnych() {
