@@ -1,9 +1,0 @@
-
-- zwrócić uwagę na ograniczenie przy dodawaniu nazwy do listy: żeby nowe nadpisywały stare etc. Póki co, nie ma tej implementacji. dodaj przy setterze, żeby przy tworzeniu gwiazdy sama brała następnego enuma jeśli gwiazda o tej nazwie już istnieje w danym gwiazdozbioerze
-- deklinacja do poprawienia
-
-- klasa gwiazdozbiór przechowująca informacje o gwiazdach, które do niego należą ???
-
-
-Ania: deklinacja i rektasencja, obserwowana wielkość gwiazdowa i absolutna
-Dorota: Nazwa katalogowa, odległość w latach świetlych (???), temp, masa, półkula

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DdlMappings">
+    <mapping uuid="e78c867c-9027-41a2-9d18-2d8c7baf88ba" name="GwiazdaDB.db Mapping">
+      <data-sources db="0e5d8ce6-1f78-4709-8335-189e17acc750" ddl="5eb47ee4-64d3-4de6-8c0a-33a1b36c3703" />
+    </mapping>
+  </component>
+</project>

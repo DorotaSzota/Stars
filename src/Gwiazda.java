@@ -1,11 +1,11 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.*;
 import java.util.HashSet;
+import java.util.List;
 
 
-public class Gwiazda implements KolekcjaGwiazd {
+public class Gwiazda  {
 
-    private List<Gwiazda> gwiazdyList = new ArrayList<>();
+
     private String nazwa;
     private String nazwaKatalogowa;
     private String deklinacja;
@@ -17,7 +17,8 @@ public class Gwiazda implements KolekcjaGwiazd {
     private String polkula;
     private double temperatura;
     private double masa;
-    private static HashSet<Character> zajeteLitery = new HashSet<>();
+    private static HashSet<String> zajeteLitery = new HashSet<String>();
+    private static final String sciezka = "jdbc:sqlite:./GwiazdaDB.db";
 
 
 
@@ -37,14 +38,11 @@ public class Gwiazda implements KolekcjaGwiazd {
         this.polkula = polkula;
         this.temperatura = temperatura;
         this.masa = masa;
-        generujNazweKatalogowa();
+        //generujNazweKatalogowa();
     }
 
 
     //GETTERS & SETTERS
-    public List<Gwiazda> getGwiazdyList() {
-        return gwiazdyList;
-    }
     public String getNazwa() {
         return nazwa;
     }
@@ -60,8 +58,9 @@ public class Gwiazda implements KolekcjaGwiazd {
     public String getNazwaKatalogowa() {
         return nazwaKatalogowa;
     }
+
     public void setNazwaKatalogowa(String nazwaKatalogowa) {
-        this.nazwaKatalogowa = nazwaKatalogowa;
+        this.nazwaKatalogowa = generujNazweKatalogowa(nazwaKatalogowa);
     }
 
     public String getDeklinacja() {
@@ -182,92 +181,109 @@ public class Gwiazda implements KolekcjaGwiazd {
             throw new IllegalArgumentException("Nieprawidłowa masa gwiazdy. Min. 0,1 masy Słońca, max. 50 mas Słońca."); }
     }
 
-    //może tutaj można zrobić logikę przeszukiwania listy gwiazd i sprawdzania czy nazwa katalogowa już istnieje?
-//    private boolean czyNazwaKatalogowaJuzIstnieje() {
-//        for (Gwiazda gwiazda : gwiazdyList) {
-//            if (gwiazda.getNazwaKatalogowa().equals(this.nazwaKatalogowa)) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
-    private void generujNazweKatalogowa() {
-        char litera = znajdzWolnaLitere();
-        this.nazwaKatalogowa = litera + " " + gwiazdozbior;
-        zajeteLitery.add(litera);
+    private String generujNazweKatalogowa(String gwiazdozbior) {
+        String litera = znajdzWolnaLitere();
+        return litera + " " + gwiazdozbior;
     }
-    private char znajdzWolnaLitere() {
+
+    private String znajdzWolnaLitere() {
         AlfabetGrecki[] alfabet = AlfabetGrecki.values();
         for (int i = 0; i < alfabet.length; i++) {
-            char litera = alfabet[i].toString().charAt(0);
+            String litera = alfabet[i].toString();
             if (!zajeteLitery.contains(litera)) {
+                zajeteLitery.add(litera);
                 return litera;
             }
         }
-        throw new IllegalStateException("Nie można znaleźć wolnej litery w alfabecie greckim.");
+        throw new IllegalStateException("Nie można znaleźć wolnego symbolu w alfabecie greckim.");
     }
 
 
+    private void aktualizujBazeDanych(Gwiazda gwiazda) {
+        try (Connection connection = DriverManager.getConnection(sciezka)) {
+            String nazwaKatalogowa = generujNazweKatalogowa(gwiazda.getGwiazdozbior());
 
-    //IMPLEMENTACJA INTERFEJSU
-    @Override
-    public void dodajGwiazde(List<Gwiazda> listaGwiazd, Gwiazda nowaGwiazda) {
-        for (Gwiazda gwiazda : listaGwiazd) {
-            if (gwiazda.getNazwaKatalogowa().equals(nowaGwiazda.getNazwaKatalogowa())) {
-                throw new IllegalArgumentException("Gwiazda o podanej nazwie katalogowej już istnieje.");
-            }
-        }
-        listaGwiazd.add(nowaGwiazda);
+            String checkQuery = "SELECT nazwa FROM gwiazdy WHERE nazwa=?";
+            try (PreparedStatement checkStatement = connection.prepareStatement(checkQuery)) {
+                checkStatement.setString(1, gwiazda.getNazwa());
+                ResultSet resultSet = checkStatement.executeQuery();
 
-        //DO POPRAWIENIA
-        for (Gwiazda gwiazda : listaGwiazd) {
-            if (gwiazda != nowaGwiazda && gwiazda.getGwiazdozbior().equals(nowaGwiazda.getGwiazdozbior())) {
-                gwiazda.setNazwaKatalogowa("gamma " + gwiazda.getGwiazdozbior());
-            }
-        }
-    }
+                if (resultSet.next()) {
+                    // Gwiazda już istnieje w bazie danych, aktualizuj NazwaKatalogowa
+                    String updateQuery = "UPDATE gwiazdy SET nazwaKatalogowa=? WHERE nazwa=?";
+                    try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
+                        updateStatement.setString(1, nazwaKatalogowa);
+                        updateStatement.setString(2, gwiazda.getNazwa());
+                        updateStatement.executeUpdate();
+                    }
+                } else {
+                    String insertQuery = "INSERT INTO gwiazdy VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+                        preparedStatement.setString(1, gwiazda.getNazwa());
+                        preparedStatement.setString(2, gwiazda.getDeklinacja());
+                        preparedStatement.setString(3, gwiazda.getRektascensja());
+                        preparedStatement.setDouble(4, gwiazda.getObserwowanaWielkoscGwiazdowa());
+                        preparedStatement.setDouble(5, gwiazda.getAbsolutnaWielkoscGwiazdowa());
+                        preparedStatement.setDouble(6, gwiazda.getOdlegloscWLatachSwietlnych());
+                        preparedStatement.setString(7, gwiazda.getGwiazdozbior());
+                        preparedStatement.setString(8, gwiazda.getPolkula());
+                        preparedStatement.setDouble(9, gwiazda.getTemperatura());
+                        preparedStatement.setDouble(10, gwiazda.getMasa());
+                        preparedStatement.setString(11, nazwaKatalogowa);
 
-    @Override
-    public void usunGwiazde(List<Gwiazda> gwiazdyList, String nazwaKatalogowa) {
-        Gwiazda gwiazdaToRemove = null;
-        for (Gwiazda gwiazda : gwiazdyList) {
-            if (gwiazda.getNazwaKatalogowa().equals(nazwaKatalogowa)) {
-                gwiazdaToRemove = gwiazda;
-                break;
-            }
-        }
-        if (gwiazdaToRemove != null) {
-            gwiazdyList.remove(gwiazdaToRemove);
-
-            // Aktualizacja nazw katalogowych pozostałych gwiazd w tym samym gwiazdozbiorze
-            //DO POPRAWIENIA
-            for (Gwiazda gwiazda : gwiazdyList) {
-                if (gwiazda.getGwiazdozbior().equals(gwiazdaToRemove.getGwiazdozbior())) {
-                    gwiazda.setNazwaKatalogowa("beta " + gwiazdaToRemove.getGwiazdozbior());
+                        preparedStatement.executeUpdate();
+                    }
                 }
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-
     }
 
-    @Override
-    public void wyswietlGwiazdy(List<Gwiazda> gwiazdyList) {
-        for (int i = 0; i < gwiazdyList.size(); i++) {
-            Gwiazda gwiazda = gwiazdyList.get(i);
-            System.out.println("Gwiazda " + (i + 1) + ":");
-            System.out.println("Nazwa: " + gwiazda.getNazwa());
-            System.out.println("Nazwa Katalogowa: " + gwiazda.getNazwaKatalogowa());
-            System.out.println("Deklinacja: " + gwiazda.getDeklinacja());
-            System.out.println("Rektascensja: " + gwiazda.getRektascensja());
-            System.out.println("Obserwowana Wielkość Gwiazdowa: " + gwiazda.getObserwowanaWielkoscGwiazdowa());
-            System.out.println("Absolutna Wielkość Gwiazdowa: " + gwiazda.getAbsolutnaWielkoscGwiazdowa());
-            System.out.println("Odległość w Latach Świetlnych: " + gwiazda.getOdlegloscWLatachSwietlnych() + " lat świetlnych");
-            System.out.println("Gwiazdozbiór: " + gwiazda.getGwiazdozbior());
-            System.out.println("Półkula: " + gwiazda.getPolkula());
-            System.out.println("Temperatura: " + gwiazda.getTemperatura());
-            System.out.println("Masa: " + gwiazda.getMasa());
-            System.out.println("--------------");
+    public void dodajGwiazdeDoBazy(Gwiazda nowaGwiazda) {
+        aktualizujBazeDanych(nowaGwiazda);
+    }
+
+    public void usunGwiazdeZBazy(Gwiazda gwiazdaDoUsuniecia) {
+        try (Connection connection = DriverManager.getConnection(sciezka)) {
+            String deleteQuery = "DELETE FROM gwiazdy WHERE nazwa=?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery)) {
+                preparedStatement.setString(1, gwiazdaDoUsuniecia.getNazwa());
+                preparedStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void wyswietlGwiazdy() {
+        try (Connection connection = DriverManager.getConnection(sciezka);
+             Statement statement = connection.createStatement()) {
+
+            String selectQuery = "SELECT * FROM gwiazdy";
+            ResultSet resultSet = statement.executeQuery(selectQuery);
+
+            int numerGwiazdy = 1;
+            while (resultSet.next()) {
+                System.out.println("Gwiazda " + numerGwiazdy + ":");
+                System.out.println("Nazwa: " + resultSet.getString("nazwa"));
+                System.out.println("Nazwa Katalogowa: " + resultSet.getString("nazwaKatalogowa"));
+                System.out.println("Deklinacja: " + resultSet.getString("deklinacja"));
+                System.out.println("Rektascensja: " + resultSet.getString("rektascensja"));
+                System.out.println("Obserwowana Wielkość Gwiazdowa: " + resultSet.getDouble("obserwowanaWielkoscGwiazdowa"));
+                System.out.println("Absolutna Wielkość Gwiazdowa: " + resultSet.getDouble("absolutnaWielkoscGwiazdowa"));
+                System.out.println("Odległość w Latach Świetlnych: " + resultSet.getDouble("odlegloscWLatachSwietlnych") + " lat świetlnych");
+                System.out.println("Gwiazdozbiór: " + resultSet.getString("gwiazdozbior"));
+                System.out.println("Półkula: " + resultSet.getString("polkula"));
+                System.out.println("Temperatura: " + resultSet.getDouble("temperatura"));
+                System.out.println("Masa: " + resultSet.getDouble("masa"));
+                System.out.println("--------------");
+
+                numerGwiazdy++;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }
