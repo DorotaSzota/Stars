@@ -4,3 +4,6 @@
 
 - klasa gwiazdozbiór przechowująca informacje o gwiazdach, które do niego należą ???
 
+
+Ania: deklinacja i rektasencja, obserwowana wielkość gwiazdowa i absolutna
+Dorota: Nazwa katalogowa, odległość w latach świetlych (???), temp, masa, półkula

@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+
 
 public class Gwiazda implements KolekcjaGwiazd {
 
@@ -15,6 +17,9 @@ public class Gwiazda implements KolekcjaGwiazd {
     private String polkula;
     private double temperatura;
     private double masa;
+    private static HashSet<Character> zajeteLitery = new HashSet<>();
+
+
 
     //KONSTRUKTOR
     public Gwiazda() {
@@ -32,7 +37,7 @@ public class Gwiazda implements KolekcjaGwiazd {
         this.polkula = polkula;
         this.temperatura = temperatura;
         this.masa = masa;
-        generujNazweKatalogowa(); //czy tu nie powinno być this.nazwaKatalogowa = generujNazweKatalogowa(); ?
+        generujNazweKatalogowa();
     }
 
 
@@ -55,8 +60,6 @@ public class Gwiazda implements KolekcjaGwiazd {
     public String getNazwaKatalogowa() {
         return nazwaKatalogowa;
     }
-
-    //DO POPRAWIENIA, czyli implementacja logiki dodawania alf i bet etc.
     public void setNazwaKatalogowa(String nazwaKatalogowa) {
         this.nazwaKatalogowa = nazwaKatalogowa;
     }
@@ -163,7 +166,7 @@ public class Gwiazda implements KolekcjaGwiazd {
         if (temperatura >= 2000) {
             this.temperatura = temperatura;
         } else {
-            throw new IllegalArgumentException("Nieprawidłowa temperatura gwiazdy.");
+            throw new IllegalArgumentException("Nieprawidłowa temperatura gwiazdy. Minimalna temperatura to 2000 C.");
         }
     }
 
@@ -176,49 +179,36 @@ public class Gwiazda implements KolekcjaGwiazd {
         if (masa >= (0.1 * masaSlonca) && masa <= (50 * masaSlonca)) {
             this.masa = masa;
         } else {
-            throw new IllegalArgumentException("Nieprawidłowa masa gwiazdy."); }
+            throw new IllegalArgumentException("Nieprawidłowa masa gwiazdy. Min. 0,1 masy Słońca, max. 50 mas Słońca."); }
     }
 
     //może tutaj można zrobić logikę przeszukiwania listy gwiazd i sprawdzania czy nazwa katalogowa już istnieje?
-    private boolean czyNazwaKatalogowaJuzIstnieje() {
-        for (Gwiazda gwiazda : gwiazdyList) {
-            if (gwiazda.getNazwaKatalogowa().equals(this.nazwaKatalogowa)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void generujNazweKatalogowa() {
-        AlfabetGrecki[] alfabet = AlfabetGrecki.values();
-        for (int i = 0; i < alfabet.length; i++) {
-            this.nazwaKatalogowa = alfabet[i] + " " + gwiazdozbior;
-            if (!czyNazwaKatalogowaJuzIstnieje()) {
-                return;
-            }
-        }
-    }
-
-
-//    private void generujNazweKatalogowa() {
-//        AlfabetGrecki[] alfabet = AlfabetGrecki.values();
-//        boolean nazwaUnikalna = false;
-//        int index = 0;
-//
-//        while (!nazwaUnikalna) {
-//            if (index >= alfabet.length) {
-//                this.nazwaKatalogowa = Integer.toString(index);
-//                nazwaUnikalna = true;
-//            } else {
-//                this.nazwaKatalogowa = alfabet[index] + " " + gwiazdozbior;
-//                if (!czyNazwaKatalogowaJuzIstnieje()) {
-//                    index++;
-//                } else {
-//                    nazwaUnikalna = true;
-//                }
+//    private boolean czyNazwaKatalogowaJuzIstnieje() {
+//        for (Gwiazda gwiazda : gwiazdyList) {
+//            if (gwiazda.getNazwaKatalogowa().equals(this.nazwaKatalogowa)) {
+//                return true;
 //            }
 //        }
+//        return false;
 //    }
+
+    private void generujNazweKatalogowa() {
+        char litera = znajdzWolnaLitere();
+        this.nazwaKatalogowa = litera + " " + gwiazdozbior;
+        zajeteLitery.add(litera);
+    }
+    private char znajdzWolnaLitere() {
+        AlfabetGrecki[] alfabet = AlfabetGrecki.values();
+        for (int i = 0; i < alfabet.length; i++) {
+            char litera = alfabet[i].toString().charAt(0);
+            if (!zajeteLitery.contains(litera)) {
+                return litera;
+            }
+        }
+        throw new IllegalStateException("Nie można znaleźć wolnej litery w alfabecie greckim.");
+    }
+
+
 
     //IMPLEMENTACJA INTERFEJSU
     @Override
@@ -272,7 +262,7 @@ public class Gwiazda implements KolekcjaGwiazd {
             System.out.println("Rektascensja: " + gwiazda.getRektascensja());
             System.out.println("Obserwowana Wielkość Gwiazdowa: " + gwiazda.getObserwowanaWielkoscGwiazdowa());
             System.out.println("Absolutna Wielkość Gwiazdowa: " + gwiazda.getAbsolutnaWielkoscGwiazdowa());
-            System.out.println("Odległość w Latach Świetlnych: " + gwiazda.getOdlegloscWLatachSwietlnych());
+            System.out.println("Odległość w Latach Świetlnych: " + gwiazda.getOdlegloscWLatachSwietlnych() + " lat świetlnych");
             System.out.println("Gwiazdozbiór: " + gwiazda.getGwiazdozbior());
             System.out.println("Półkula: " + gwiazda.getPolkula());
             System.out.println("Temperatura: " + gwiazda.getTemperatura());
