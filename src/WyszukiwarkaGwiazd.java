@@ -1,117 +1,85 @@
-//W bazie mozliwe jest wyszukiwanie obiektów na podstawie nastepujacych
-//        kryteriów:
-//        wyszukaj wszystkie gwiazdy w gwiazdozbiorze;
-//        wyszukaj gwiazdy znajdujace sie w odległosci x parseków od Ziemii
-//        (nalezy uwzglednic iz obiekt gwiazdowy opisany jest przy pomocy lat
-//        swietlnych);
-//        wyszukaj gwiazdy o temperaturze w zadanym przedziale;
-//        wyszukaj gwiazdy o wielkosci gwiazdowej w zadanym przedziale;
-//        wyszukaj gwiazdy z półkuli północnej / południowej;
-//        wyszukaj potencjalne supernowe. Supernowe to gwiazdy, których
-//        masa przekracza tzw. granice Chandrasekhara, która wynosi 1.44
-//        masy Słonca.
-//        Wszystkie dane powinny zostac zapisane w pliku obiektowym.
-//        Poszczególne elementy projektu powinny byc zrealizowane jako funkcje,
-//        lub metody klasy.
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-
-public class WyszukiwarkaGwiazd implements Wyszukiwarka {
-    private List<Gwiazda> gwiazdy;
-
-    public WyszukiwarkaGwiazd(List<Gwiazda> gwiazdy) {
-        this.gwiazdy = gwiazdy;
+public class WyszukiwarkaGwiazd {
+    private Connection connection;
+    private String sciezka = "jdbc:sqlite:./GwiazdaDB.db";
+    public WyszukiwarkaGwiazd(Connection connection) {
+        this.connection = connection;
     }
 
-    public List<Gwiazda> wyszukajWGwiazdozbiorze(String gwiazdozbior) {
-        List<Gwiazda> wyniki = new ArrayList<>();
-        for (Gwiazda gwiazda : gwiazdy) {
-            if (gwiazda.getGwiazdozbior().equalsIgnoreCase(gwiazdozbior)) {
-                wyniki.add(gwiazda);
+    public void wyszukajWGwiazdozbiorze(String gwiazdozbior) {
+        String sql = "SELECT * FROM gwiazdy WHERE gwiazdozbior = ?";
+        wyszukajIWyswietl(sql, gwiazdozbior);
+    }
+
+    public void wyszukajWedlugOdleglosci(double odlegloscWParskach) {
+        double odlegloscWLatachSwietlnych = odlegloscWParskach * 3.26;
+
+        String sql = "SELECT * FROM gwiazdy WHERE odlegloscWLatachSwietlnych <= ?";
+        wyszukajIWyswietl(sql, String.valueOf(odlegloscWLatachSwietlnych));
+    }
+
+    public void wyszukajWedlugTemperatury(double minTemperatura, double maxTemperatura) {
+        String sql = "SELECT * FROM gwiazdy WHERE temperatura BETWEEN ? AND ?";
+        wyszukajIWyswietl(sql, String.valueOf(minTemperatura), String.valueOf(maxTemperatura));
+    }
+
+    public void wyszukajWedlugWielkosciGwiazdowej(double minWielkosc, double maxWielkosc) {
+        String sql = "SELECT * FROM gwiazdy WHERE obserwowanaWielkoscGwiazdowa BETWEEN ? AND ?";
+        wyszukajIWyswietl(sql, String.valueOf(minWielkosc), String.valueOf(maxWielkosc));
+    }
+
+    public void wyszukajWedlugPolkuli(String polkula) {
+        String sql = "SELECT * FROM gwiazdy WHERE polkula = ?";
+        wyszukajIWyswietl(sql, polkula);
+    }
+
+    public void wyszukajlPotencjalneSupernowe() {
+        String sql = "SELECT * FROM gwiazdy WHERE masa > 1.44";
+        wyszukajIWyswietl(sql);
+    }
+
+    private void wyszukajIWyswietl(String sql, String... parametry) {
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            for (int i = 0; i < parametry.length; i++) {
+                statement.setString(i + 1, parametry[i]);
             }
-        }
-        return wyniki;
-    }
 
-    public List<Gwiazda> wyszukajWOdleglosci(double odlegloscWLatachSwietlnych) {
-        List<Gwiazda> wyniki = new ArrayList<>();
-        for (Gwiazda gwiazda : gwiazdy) {
-            if (gwiazda.getOdlegloscWLatachSwietlnych() <= odlegloscWLatachSwietlnych) {
-                wyniki.add(gwiazda);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                int numerGwiazdy = 1;
+                while (resultSet.next()) {
+                    wyswietlDaneGwiazdy(resultSet, numerGwiazdy);
+                    numerGwiazdy++;
+                }
             }
-        }
-        return wyniki;
-    }
-
-    public List<Gwiazda> wyszukajWGwiazdozbiorzeIOdleglosci(String gwiazdozbior, double odlegloscWLatachSwietlnych) {
-        List<Gwiazda> wyniki = new ArrayList<>();
-        for (Gwiazda gwiazda : gwiazdy) {
-            if (gwiazda.getGwiazdozbior().equalsIgnoreCase(gwiazdozbior)
-                    && gwiazda.getOdlegloscWLatachSwietlnych() <= odlegloscWLatachSwietlnych) {
-                wyniki.add(gwiazda);
-            }
-        }
-        return wyniki;
-    }
-
-    public List<Gwiazda> wyszukajWTemperaturze(double minTemperatura, double maxTemperatura) {
-        List<Gwiazda> wyniki = new ArrayList<>();
-        for (Gwiazda gwiazda : gwiazdy) {
-            if (gwiazda.getTemperatura() >= minTemperatura && gwiazda.getTemperatura() <= maxTemperatura) {
-                wyniki.add(gwiazda);
-            }
-        }
-        return wyniki;
-    }
-
-    public List<Gwiazda> wyszukajWWielkosciGwiazdowej(double minWielkosc, double maxWielkosc) {
-        List<Gwiazda> wyniki = new ArrayList<>();
-        for (Gwiazda gwiazda : gwiazdy) {
-            if (gwiazda.getObserwowanaWielkoscGwiazdowa() >= minWielkosc
-                    && gwiazda.getObserwowanaWielkoscGwiazdowa() <= maxWielkosc) {
-                wyniki.add(gwiazda);
-            }
-        }
-        return wyniki;
-    }
-
-    public List<Gwiazda> wyszukajWPolkuli(String polkula) {
-        List<Gwiazda> wyniki = new ArrayList<>();
-        for (Gwiazda gwiazda : gwiazdy) {
-            if (gwiazda.getPolkula().equalsIgnoreCase(polkula)) {
-                wyniki.add(gwiazda);
-            }
-        }
-        return wyniki;
-    }
-
-    public List<Gwiazda> wyszukajPotencjalneSupernowe() {
-        List<Gwiazda> wyniki = new ArrayList<>();
-        for (Gwiazda gwiazda : gwiazdy) {
-            if (gwiazda.getMasa() > 1.44) {
-                wyniki.add(gwiazda);
-            }
-        }
-        return wyniki;
-    }
-
-    public void zapiszDoPliku(String nazwaPliku) {
-        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(nazwaPliku))) {
-            outputStream.writeObject(gwiazdy);
-        } catch (IOException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public void wczytajZPliku(String nazwaPliku) {
-        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(nazwaPliku))) {
-            gwiazdy = (List<Gwiazda>) inputStream.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+    private void wyswietlDaneGwiazdy(ResultSet resultSet, int numerGwiazdy) throws SQLException {
+        Gwiazda gwiazda = mapujResultSetNaGwiazde(resultSet);
+        System.out.println("Gwiazda " + numerGwiazdy + ":");
+        System.out.println(gwiazda);
+        System.out.println("--------------");
+    }
+
+    private Gwiazda mapujResultSetNaGwiazde(ResultSet resultSet) throws SQLException {
+        Gwiazda gwiazda = new Gwiazda();
+        gwiazda.setNazwa(resultSet.getString("nazwa"));
+        gwiazda.setNazwaKatalogowa(resultSet.getString("nazwaKatalogowa"));
+        gwiazda.setDeklinacja(resultSet.getString("deklinacja"));
+        gwiazda.setRektascensja(resultSet.getString("rektascensja"));
+        gwiazda.setObserwowanaWielkoscGwiazdowa(resultSet.getDouble("obserwowanaWielkoscGwiazdowa"));
+        gwiazda.setAbsolutnaWielkoscGwiazdowa(resultSet.getDouble("absolutnaWielkoscGwiazdowa"));
+        gwiazda.setOdlegloscWLatachSwietlnych(resultSet.getDouble("odlegloscWLatachSwietlnych"));
+        gwiazda.setGwiazdozbior(resultSet.getString("gwiazdozbior"));
+        gwiazda.setPolkula(resultSet.getString("polkula"));
+        gwiazda.setTemperatura(resultSet.getDouble("temperatura"));
+        gwiazda.setMasa(resultSet.getDouble("masa"));
+        return gwiazda;
     }
 }
-

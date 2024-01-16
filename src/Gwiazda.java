@@ -35,7 +35,7 @@ public class Gwiazda  {
         this.obserwowanaWielkoscGwiazdowa = obserwowanaWielkoscGwiazdowa;
         this.odlegloscWLatachSwietlnych = odlegloscWLatachSwietlnych;
         this.gwiazdozbior = gwiazdozbior;
-        this.polkula = polkula;
+        this.polkula = (polkula != null) ? polkula : "brak";
         this.temperatura = temperatura;
         this.masa = masa;
         //generujNazweKatalogowa();
@@ -74,7 +74,7 @@ public class Gwiazda  {
             double sekundy = Integer.parseInt(deklinacja.substring(deklinacja.indexOf("'") + 1, deklinacja.indexOf("\"")));
             if ((stopnie > -90 && stopnie < 90 && minuty >= 0 && minuty <= 59 && sekundy >= 0 && sekundy <= 59.99) ||
                     (stopnie == 90 && minuty == 0 && sekundy == 0) || (stopnie == -90 && minuty == 0 && sekundy == 0)) {
-                if ((stopnie < 0 && polkula.equals("PD")) || (stopnie >= 0 && polkula.equals("PN"))){
+                if ((stopnie < 0 && (polkula != null && polkula.equals("PD"))) || (stopnie >= 0 && (polkula != null && polkula.equals("PN")))) {
                     this.deklinacja = deklinacja;
                 } else {
                     throw new IllegalArgumentException("Nieprawidłowa półkula.");
