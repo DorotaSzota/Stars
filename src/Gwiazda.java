@@ -1,4 +1,7 @@
+import java.io.*;
 import java.sql.*;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -17,7 +20,7 @@ public class Gwiazda  {
     private String polkula;
     private double temperatura;
     private double masa;
-    private static HashSet<String> zajeteLitery = new HashSet<String>();
+    private static List<AlfabetGrecki> zajeteLitery = wczytajZajeteLitery();
     private static final String sciezka = "jdbc:sqlite:./GwiazdaDB.db";
 
 
@@ -25,18 +28,18 @@ public class Gwiazda  {
     //KONSTRUKTOR
     public Gwiazda() {
     }
-    public Gwiazda(String nazwa, String deklinacja, String rektascensja,
+    public Gwiazda(String nazwa, String polkula,String deklinacja, String rektascensja,
                    double obserwowanaWielkoscGwiazdowa, double odlegloscWLatachSwietlnych,
-                   String gwiazdozbior, String polkula, double temperatura, double masa) {
+                   String gwiazdozbior,  double temperatura, double masa) {
 
         this.nazwa = nazwa;
+        this.polkula = (polkula != null) ? polkula : "brak";
         this.deklinacja = deklinacja;
         this.rektascensja = rektascensja;
         this.obserwowanaWielkoscGwiazdowa = obserwowanaWielkoscGwiazdowa;
         this.odlegloscWLatachSwietlnych = odlegloscWLatachSwietlnych;
         this.absolutnaWielkoscGwiazdowa = setAbsolutnaWielkoscGwiazdowa(obserwowanaWielkoscGwiazdowa);
         this.gwiazdozbior = gwiazdozbior;
-        this.polkula = (polkula != null) ? polkula : "brak";
         this.temperatura = temperatura;
         this.masa = masa;
         //generujNazweKatalogowa();
@@ -176,11 +179,12 @@ public class Gwiazda  {
     }
 
     public void setMasa(double masa) {
-        double masaSlonca = 1.9891 * Math.pow(10, 30);
+        double masaSlonca = 1;
         if (masa >= (0.1 * masaSlonca) && masa <= (50 * masaSlonca)) {
             this.masa = masa;
         } else {
-            throw new IllegalArgumentException("Nieprawidłowa masa gwiazdy. Min. 0,1 masy Słońca, max. 50 mas Słońca."); }
+            throw new IllegalArgumentException("Nieprawidłowa masa gwiazdy. Min. 0,1 masy Słońca, max. 50 mas Słońca.");
+        }
     }
 
     private String generujNazweKatalogowa(String gwiazdozbior) {
@@ -190,14 +194,28 @@ public class Gwiazda  {
 
     private String znajdzWolnaLitere() {
         AlfabetGrecki[] alfabet = AlfabetGrecki.values();
-        for (int i = 0; i < alfabet.length; i++) {
-            String litera = alfabet[i].toString();
-            if (!zajeteLitery.contains(litera)) {
-                zajeteLitery.add(litera);
-                return litera;
-            }
+        for (int i = 0; i < alfabet.length - 1; i++) {
+            if (!zajeteLitery.contains(alfabet[i])) {
+                return alfabet[i].toString();}
+
         }
+
         throw new IllegalStateException("Nie można znaleźć wolnego symbolu w alfabecie greckim.");
+    }
+    private static List<AlfabetGrecki> wczytajZajeteLitery() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("zajeteLitery.ser"))) {
+            return (List<AlfabetGrecki>) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    static void zapiszZajeteLitery() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("zajeteLitery.ser"))) {
+            oos.writeObject(zajeteLitery);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -205,21 +223,16 @@ public class Gwiazda  {
         try (Connection connection = DriverManager.getConnection(sciezka)) {
             String nazwaKatalogowa = generujNazweKatalogowa(gwiazda.getGwiazdozbior());
 
-            String checkQuery = "SELECT nazwa FROM gwiazdy WHERE nazwa=?";
-            try (PreparedStatement checkStatement = connection.prepareStatement(checkQuery)) {
-                checkStatement.setString(1, gwiazda.getNazwa());
-                ResultSet resultSet = checkStatement.executeQuery();
+            String updateQuery = "UPDATE gwiazdy SET nazwaKatalogowa=? WHERE nazwa=?";
+            String insertQuery = "INSERT INTO gwiazdy VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-                if (resultSet.next()) {
-                    // Gwiazda już istnieje w bazie danych, aktualizuj NazwaKatalogowa
-                    String updateQuery = "UPDATE gwiazdy SET nazwaKatalogowa=? WHERE nazwa=?";
-                    try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
-                        updateStatement.setString(1, nazwaKatalogowa);
-                        updateStatement.setString(2, gwiazda.getNazwa());
-                        updateStatement.executeUpdate();
-                    }
-                } else {
-                    String insertQuery = "INSERT INTO gwiazdy VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement checkStatement = connection.prepareStatement(updateQuery)) {
+                checkStatement.setString(1, nazwaKatalogowa);
+                checkStatement.setString(2, gwiazda.getNazwa());
+
+                int updatedRows = checkStatement.executeUpdate();
+
+                if (updatedRows == 0) {
                     try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
                         preparedStatement.setString(1, gwiazda.getNazwa());
                         preparedStatement.setString(2, gwiazda.getDeklinacja());
@@ -232,10 +245,15 @@ public class Gwiazda  {
                         preparedStatement.setDouble(9, gwiazda.getTemperatura());
                         preparedStatement.setDouble(10, gwiazda.getMasa());
                         preparedStatement.setString(11, nazwaKatalogowa);
-
+                        zajeteLitery.add(AlfabetGrecki.valueOf(nazwaKatalogowa.substring(0, nazwaKatalogowa.indexOf(" "))));
                         preparedStatement.executeUpdate();
                     }
+                } else {
+                    zajeteLitery.add(AlfabetGrecki.valueOf(nazwaKatalogowa.substring(0, nazwaKatalogowa.indexOf(" "))));
                 }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -251,12 +269,26 @@ public class Gwiazda  {
             String deleteQuery = "DELETE FROM gwiazdy WHERE nazwa=?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery)) {
                 preparedStatement.setString(1, gwiazdaDoUsuniecia.getNazwa());
-                preparedStatement.executeUpdate();
+                int deletedRows = preparedStatement.executeUpdate();
+
+                if (deletedRows > 0) {
+                    zajeteLitery.remove(AlfabetGrecki.valueOf(nazwaKatalogowa.substring(0, nazwaKatalogowa.indexOf(" "))));
+                    zapiszZajeteLitery();
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+    public static void wyczyscZajeteLitery() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("zajeteLitery.ser"))) {
+            List<AlfabetGrecki> pustaLista = new ArrayList<>();
+            oos.writeObject(pustaLista);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void wyswietlGwiazdy() {
         try (Connection connection = DriverManager.getConnection(sciezka);
@@ -288,7 +320,6 @@ public class Gwiazda  {
         }
     }
 }
-
 
 
 

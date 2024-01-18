@@ -63,13 +63,24 @@ public class WyszukiwarkaGwiazd {
     public void wyswietlDaneGwiazdy(ResultSet resultSet, int numerGwiazdy) throws SQLException {
         Gwiazda gwiazda = mapujResultSetNaGwiazde(resultSet);
         System.out.println("Gwiazda " + numerGwiazdy + ":");
-        System.out.println(gwiazda);
+        System.out.println("Nazwa: " + gwiazda.getNazwa());
+        System.out.println("Nazwa katalogowa: " + gwiazda.getNazwaKatalogowa());
+        System.out.println("Półkula: " + gwiazda.getPolkula());
+        System.out.println("Deklinacja: " + gwiazda.getDeklinacja());
+        System.out.println("Rektascensja: " + gwiazda.getRektascensja());
+        System.out.println("Obserwowana wielkość gwiazdowa: " + gwiazda.getObserwowanaWielkoscGwiazdowa());
+        System.out.println("Absolutna wielkość gwiazdowa: " + gwiazda.getAbsolutnaWielkoscGwiazdowa());
+        System.out.println("Odległość w latach świetlnych: " + gwiazda.getOdlegloscWLatachSwietlnych());
+        System.out.println("Gwiazdozbiór: " + gwiazda.getGwiazdozbior());
+        System.out.println("Temperatura: " + gwiazda.getTemperatura());
+        System.out.println("Masa: " + gwiazda.getMasa());
         System.out.println("--------------");
     }
 
     public Gwiazda mapujResultSetNaGwiazde(ResultSet resultSet) throws SQLException {
         Gwiazda gwiazda = new Gwiazda();
         gwiazda.setNazwa(resultSet.getString("nazwa"));
+        gwiazda.setPolkula(resultSet.getString("polkula"));
         gwiazda.setNazwaKatalogowa(resultSet.getString("nazwaKatalogowa"));
         gwiazda.setDeklinacja(resultSet.getString("deklinacja"));
         gwiazda.setRektascensja(resultSet.getString("rektascensja"));
@@ -77,7 +88,6 @@ public class WyszukiwarkaGwiazd {
         gwiazda.setAbsolutnaWielkoscGwiazdowa(resultSet.getDouble("absolutnaWielkoscGwiazdowa"));
         gwiazda.setOdlegloscWLatachSwietlnych(resultSet.getDouble("odlegloscWLatachSwietlnych"));
         gwiazda.setGwiazdozbior(resultSet.getString("gwiazdozbior"));
-        gwiazda.setPolkula(resultSet.getString("polkula"));
         gwiazda.setTemperatura(resultSet.getDouble("temperatura"));
         gwiazda.setMasa(resultSet.getDouble("masa"));
         return gwiazda;

@@ -1,5 +1,13 @@
 # Semester Project: Java Programming
 
+
+*<font color =  "lightblue">
+Sidenote: Things for Future Improvements*
+- *Constellation naming logic*
+- *Deletion logic*
+- *Additional conditions and checks*
+</font>
+
 ## Class: Star
 
 The `Star` class has the following fields:
@@ -45,3 +53,5 @@ All data is saved in an object file.
 
 ### Implementation
 Individual project elements are realized as functions or methods of the class.
+
+
