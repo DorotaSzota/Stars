@@ -42,7 +42,7 @@ public class WyszukiwarkaGwiazd {
         wyszukajIWyswietl(sql);
     }
 
-    private void wyszukajIWyswietl(String sql, String... parametry) {
+    public void wyszukajIWyswietl(String sql, String... parametry) {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             for (int i = 0; i < parametry.length; i++) {
                 statement.setString(i + 1, parametry[i]);
@@ -60,14 +60,14 @@ public class WyszukiwarkaGwiazd {
         }
     }
 
-    private void wyswietlDaneGwiazdy(ResultSet resultSet, int numerGwiazdy) throws SQLException {
+    public void wyswietlDaneGwiazdy(ResultSet resultSet, int numerGwiazdy) throws SQLException {
         Gwiazda gwiazda = mapujResultSetNaGwiazde(resultSet);
         System.out.println("Gwiazda " + numerGwiazdy + ":");
         System.out.println(gwiazda);
         System.out.println("--------------");
     }
 
-    private Gwiazda mapujResultSetNaGwiazde(ResultSet resultSet) throws SQLException {
+    public Gwiazda mapujResultSetNaGwiazde(ResultSet resultSet) throws SQLException {
         Gwiazda gwiazda = new Gwiazda();
         gwiazda.setNazwa(resultSet.getString("nazwa"));
         gwiazda.setNazwaKatalogowa(resultSet.getString("nazwaKatalogowa"));

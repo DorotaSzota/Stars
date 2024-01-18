@@ -11,8 +11,8 @@ public class Gwiazda  {
     private String deklinacja;
     private String rektascensja;
     private double obserwowanaWielkoscGwiazdowa;
-    private double absolutnaWielkoscGwiazdowa;
     private double odlegloscWLatachSwietlnych;
+    private double absolutnaWielkoscGwiazdowa;
     private String gwiazdozbior;
     private String polkula;
     private double temperatura;
@@ -34,6 +34,7 @@ public class Gwiazda  {
         this.rektascensja = rektascensja;
         this.obserwowanaWielkoscGwiazdowa = obserwowanaWielkoscGwiazdowa;
         this.odlegloscWLatachSwietlnych = odlegloscWLatachSwietlnych;
+        this.absolutnaWielkoscGwiazdowa = setAbsolutnaWielkoscGwiazdowa(obserwowanaWielkoscGwiazdowa);
         this.gwiazdozbior = gwiazdozbior;
         this.polkula = (polkula != null) ? polkula : "brak";
         this.temperatura = temperatura;
@@ -124,9 +125,10 @@ public class Gwiazda  {
         return absolutnaWielkoscGwiazdowa;
     }
 
-    public void setAbsolutnaWielkoscGwiazdowa(double absolutnaWielkoscGwiazdowa) {
+    public double setAbsolutnaWielkoscGwiazdowa(double obserwowanaWielkoscGwiazdowa) {
         double odlegloscWParsekach = odlegloscWLatachSwietlnych * 3.26156;
-        this.absolutnaWielkoscGwiazdowa = (obserwowanaWielkoscGwiazdowa - (5 * (Math.log10(odlegloscWParsekach)))) + 5;
+        return absolutnaWielkoscGwiazdowa = (obserwowanaWielkoscGwiazdowa - (5 * (Math.log10(odlegloscWParsekach)))) + 5;
+
     }
 
     public double getOdlegloscWLatachSwietlnych() {
@@ -255,7 +257,6 @@ public class Gwiazda  {
             e.printStackTrace();
         }
     }
-
 
     public void wyswietlGwiazdy() {
         try (Connection connection = DriverManager.getConnection(sciezka);

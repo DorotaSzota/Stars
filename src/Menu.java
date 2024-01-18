@@ -21,6 +21,7 @@ public class Menu {
 
         Scanner scanner = new Scanner(System.in);
         int wybor = scanner.nextInt();
+        scanner.nextLine();
 
         try (Connection connection = DriverManager.getConnection(sciezka)) {
         WyszukiwarkaGwiazd wyszukiwarka = new WyszukiwarkaGwiazd(connection);
@@ -86,14 +87,14 @@ public class Menu {
                 System.out.println("Podaj masę:");
                 double masa = scanner.nextDouble();
                 break;
-//            case 9:
-//                System.out.println("Usuń gwiazdę.");
-//                System.out.println("Podaj nazwę gwiazdy do usunięcia:");
-//                String nazwaDoUsuniecia = scanner.next();
-//                Gwiazda gwiazdaDoUsuniecia = new Gwiazda();
-//                gwiazdaDoUsuniecia.setNazwa(nazwaDoUsuniecia);
-//                gwiazda.usunGwiazdeZBazy(gwiazdaDoUsuniecia);
-//                break;
+           case 9:
+                System.out.println("Usuń gwiazdę.");
+                System.out.println("Podaj nazwę gwiazdy do usunięcia:");
+                String nazwaDoUsuniecia = scanner.next();
+                Gwiazda gwiazdaDoUsuniecia = new Gwiazda();
+                gwiazdaDoUsuniecia.setNazwa(nazwaDoUsuniecia);
+                gwiazdaDoUsuniecia.usunGwiazdeZBazy(gwiazdaDoUsuniecia);
+                break;
             case 0:
                 System.out.println("Wyjdź z programu.");
                 if (connection != null) {
