@@ -277,6 +277,7 @@ public class Gwiazda  {
 
     public void usunGwiazdeZBazy(Gwiazda gwiazdaDoUsuniecia) {
         try (Connection connection = DriverManager.getConnection(sciezka)) {
+            String gwiazdozbior = gwiazdaDoUsuniecia.getGwiazdozbior();
             String deleteQuery = "DELETE FROM gwiazdy WHERE nazwa=?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(deleteQuery)) {
                 preparedStatement.setString(1, gwiazdaDoUsuniecia.getNazwa());
@@ -284,6 +285,7 @@ public class Gwiazda  {
 
                 if (deletedRows > 0) {
                     System.out.println("Usunięto gwiazdę " + gwiazdaDoUsuniecia.getNazwa());
+                    aktualizujNazwyKatalogoweWGwiazdozbiorze(gwiazdozbior);
                 } else {
                     System.out.println("Nie znaleziono gwiazdy " + gwiazdaDoUsuniecia.getNazwa());
                 }
@@ -293,6 +295,29 @@ public class Gwiazda  {
         }
     }
 
+    private void aktualizujNazwyKatalogoweWGwiazdozbiorze(String gwiazdozbior) {
+        try (Connection connection = DriverManager.getConnection(sciezka)) {
+            String updateQuery = "UPDATE gwiazdy SET nazwaKatalogowa=? WHERE nazwa=?";
+            String selectQuery = "SELECT nazwa FROM gwiazdy WHERE gwiazdozbior=?";
+
+            try (PreparedStatement selectStatement = connection.prepareStatement(selectQuery)) {
+                selectStatement.setString(1, gwiazdozbior);
+                ResultSet resultSet = selectStatement.executeQuery();
+
+                while (resultSet.next()) {
+                    String nazwaGwiazdy = resultSet.getString("nazwa");
+                    String nowaNazwaKatalogowa = generujNazweKatalogowa(gwiazdozbior);
+                    try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
+                        updateStatement.setString(1, nowaNazwaKatalogowa);
+                        updateStatement.setString(2, nazwaGwiazdy);
+                        updateStatement.executeUpdate();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     public void dodajGwiazdeDoBazy(Gwiazda nowaGwiazda) {
         aktualizujBazeDanych(nowaGwiazda);
     }
