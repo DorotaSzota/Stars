@@ -18,21 +18,21 @@ public class Main {
                 "Gwiazdozbior2",  2800, 2.1);
 
         Gwiazda gwiazda = new Gwiazda();
-        gwiazda.dodajGwiazdeDoBazy(gwiazda1);
-        gwiazda.dodajGwiazdeDoBazy(gwiazda2);
-        gwiazda.dodajGwiazdeDoBazy(gwiazda3);
-        gwiazda.dodajGwiazdeDoBazy(gwiazda4);
-        gwiazda.dodajGwiazdeDoBazy(gwiazda5);
+//        gwiazda.dodajGwiazdeDoBazy(gwiazda1);
+//        gwiazda.dodajGwiazdeDoBazy(gwiazda2);
+//        gwiazda.dodajGwiazdeDoBazy(gwiazda3);
+//        gwiazda.dodajGwiazdeDoBazy(gwiazda4);
+//        gwiazda.dodajGwiazdeDoBazy(gwiazda5);
 
 
-/*        gwiazda.usunGwiazdeZBazy(gwiazda1);
-        gwiazda.usunGwiazdeZBazy(gwiazda2);
+//        gwiazda.usunGwiazdeZBazy(gwiazda1);
+//        gwiazda.usunGwiazdeZBazy(gwiazda2);
         gwiazda.usunGwiazdeZBazy(gwiazda3);
-        gwiazda.usunGwiazdeZBazy(gwiazda4);
-        gwiazda.usunGwiazdeZBazy(gwiazda5);*/
+//        gwiazda.usunGwiazdeZBazy(gwiazda4);
+//        gwiazda.usunGwiazdeZBazy(gwiazda5);
 
 
-        //gwiazda.wyswietlGwiazdy();
+        gwiazda.wyswietlGwiazdy();
 
 
     }
