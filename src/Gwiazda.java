@@ -2,6 +2,7 @@ import java.io.*;
 import java.sql.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -20,7 +21,12 @@ public class Gwiazda  {
     private String polkula;
     private double temperatura;
     private double masa;
-    private static List<AlfabetGrecki> zajeteLitery = wczytajZajeteLitery();
+    private static HashMap<AlfabetGrecki, String> zajeteLitery;
+    private static final String PLIK_ZAJETE_LITERY = "zajeteLitery.txt";
+
+    static {
+        zajeteLitery = wczytajZajeteLitery();
+    }
     private static final String sciezka = "jdbc:sqlite:./GwiazdaDB.db";
 
 
@@ -44,7 +50,6 @@ public class Gwiazda  {
         this.masa = masa;
         //generujNazweKatalogowa();
     }
-
 
     //GETTERS & SETTERS
     public String getNazwa() {
@@ -188,36 +193,63 @@ public class Gwiazda  {
     }
 
     private String generujNazweKatalogowa(String gwiazdozbior) {
-        String litera = znajdzWolnaLitere();
+        AlfabetGrecki litera = znajdzWolnaLitere(gwiazdozbior);
         return litera + " " + gwiazdozbior;
     }
 
-    private String znajdzWolnaLitere() {
+    private AlfabetGrecki znajdzWolnaLitere(String gwiazdozbior) {
         AlfabetGrecki[] alfabet = AlfabetGrecki.values();
-        for (int i = 0; i < alfabet.length - 1; i++) {
-            if (!zajeteLitery.contains(alfabet[i])) {
-                return alfabet[i].toString();}
+        zajeteLitery = wczytajZajeteLitery();
 
+        if (zajeteLitery.containsValue(gwiazdozbior)) {
+            for (AlfabetGrecki litera : alfabet) {
+                if (!zajeteLitery.containsKey(litera)) {
+                    zajeteLitery.put(litera, gwiazdozbior);
+                    zapiszZajeteLitery();
+                    return litera;
+                }
+            }
+        } else {
+            for (AlfabetGrecki litera : alfabet) {
+                if (!zajeteLitery.containsKey(litera)) {
+                    zajeteLitery.put(litera, gwiazdozbior);
+                    zapiszZajeteLitery();
+                    return litera;
+                }
+            }
         }
 
         throw new IllegalStateException("Nie można znaleźć wolnego symbolu w alfabecie greckim.");
     }
-    private static List<AlfabetGrecki> wczytajZajeteLitery() {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("zajeteLitery.ser"))) {
-            return (List<AlfabetGrecki>) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            return new ArrayList<>();
+
+    private static HashMap<AlfabetGrecki, String> wczytajZajeteLitery() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(PLIK_ZAJETE_LITERY))) {
+            HashMap<AlfabetGrecki, String> zajeteLiteryMapa = new HashMap<>();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.trim().split(" ");
+                if (parts.length == 2) {
+                    AlfabetGrecki litera = AlfabetGrecki.valueOf(parts[0]);
+                    String gwiazdozbior = parts[1];
+                    zajeteLiteryMapa.put(litera, gwiazdozbior);
+                }
+            }
+            return zajeteLiteryMapa;
+        } catch (IOException e) {
+            return new HashMap<>();
         }
     }
 
-    static void zapiszZajeteLitery() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("zajeteLitery.ser"))) {
-            oos.writeObject(zajeteLitery);
+    private void zapiszZajeteLitery() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(PLIK_ZAJETE_LITERY, false))) {
+            for (HashMap.Entry<AlfabetGrecki, String> entry : zajeteLitery.entrySet()) {
+                writer.write(entry.getKey().toString() + " " + entry.getValue());
+                writer.newLine();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 
     private void aktualizujBazeDanych(Gwiazda gwiazda) {
         try (Connection connection = DriverManager.getConnection(sciezka)) {
@@ -245,11 +277,8 @@ public class Gwiazda  {
                         preparedStatement.setDouble(9, gwiazda.getTemperatura());
                         preparedStatement.setDouble(10, gwiazda.getMasa());
                         preparedStatement.setString(11, nazwaKatalogowa);
-                        zajeteLitery.add(AlfabetGrecki.valueOf(nazwaKatalogowa.substring(0, nazwaKatalogowa.indexOf(" "))));
                         preparedStatement.executeUpdate();
                     }
-                } else {
-                    zajeteLitery.add(AlfabetGrecki.valueOf(nazwaKatalogowa.substring(0, nazwaKatalogowa.indexOf(" "))));
                 }
 
             } catch (SQLException e) {
@@ -260,10 +289,6 @@ public class Gwiazda  {
         }
     }
 
-    public void dodajGwiazdeDoBazy(Gwiazda nowaGwiazda) {
-        aktualizujBazeDanych(nowaGwiazda);
-    }
-
     public void usunGwiazdeZBazy(Gwiazda gwiazdaDoUsuniecia) {
         try (Connection connection = DriverManager.getConnection(sciezka)) {
             String deleteQuery = "DELETE FROM gwiazdy WHERE nazwa=?";
@@ -272,7 +297,7 @@ public class Gwiazda  {
                 int deletedRows = preparedStatement.executeUpdate();
 
                 if (deletedRows > 0) {
-                    zajeteLitery.remove(AlfabetGrecki.valueOf(nazwaKatalogowa.substring(0, nazwaKatalogowa.indexOf(" "))));
+                    zajeteLitery.remove(gwiazdaDoUsuniecia.getGwiazdozbior());
                     zapiszZajeteLitery();
                 }
             }
@@ -280,15 +305,10 @@ public class Gwiazda  {
             e.printStackTrace();
         }
     }
-    public static void wyczyscZajeteLitery() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("zajeteLitery.ser"))) {
-            List<AlfabetGrecki> pustaLista = new ArrayList<>();
-            oos.writeObject(pustaLista);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
+    public void dodajGwiazdeDoBazy(Gwiazda nowaGwiazda) {
+        aktualizujBazeDanych(nowaGwiazda);
+    }
 
     public void wyswietlGwiazdy() {
         try (Connection connection = DriverManager.getConnection(sciezka);

@@ -1,0 +1,5 @@
+DELTA Gwiazdozbior1
+ALFA Gwiazdozbior1
+BETA Gwiazdozbior1
+GAMMA Gwiazdozbior1
+EPSILON Gwiazdozbior2

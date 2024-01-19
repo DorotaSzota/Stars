@@ -90,7 +90,7 @@ public class Menu {
                         System.out.println("Podaj masę:");
                         double masa = scanner.nextDouble();
                         break;
-                    case 9: //działa ale wyrzuca wyjątek :-/
+                    case 9: //działa
                         System.out.println("Usuń gwiazdę.");
                         System.out.println("Podaj nazwę gwiazdy do usunięcia:");
                         String nazwaDoUsuniecia = scanner.next();
