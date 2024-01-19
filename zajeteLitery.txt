@@ -1,5 +1,11 @@
-DELTA Gwiazdozbior1
 ALFA Gwiazdozbior1
-BETA Gwiazdozbior1
+ZETA Gwiazdozbior1
 GAMMA Gwiazdozbior1
+THETA Gwiazdozbior1
+BETA Gwiazdozbior1
 EPSILON Gwiazdozbior2
+DELTA Gwiazdozbior1
+LAMBDA KAPPA Gwiazdozbior2
+IOTA Gwiazdozbior1
+KAPPA Gwiazdozbior2
+ETA Gwiazdozbior1

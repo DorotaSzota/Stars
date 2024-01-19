@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.sql.Connection;
 
 
 public class Gwiazda  {
@@ -21,12 +22,6 @@ public class Gwiazda  {
     private String polkula;
     private double temperatura;
     private double masa;
-    private static HashMap<AlfabetGrecki, String> zajeteLitery;
-    private static final String PLIK_ZAJETE_LITERY = "zajeteLitery.txt";
-
-    static {
-        zajeteLitery = wczytajZajeteLitery();
-    }
     private static final String sciezka = "jdbc:sqlite:./GwiazdaDB.db";
 
 
@@ -48,7 +43,7 @@ public class Gwiazda  {
         this.gwiazdozbior = gwiazdozbior;
         this.temperatura = temperatura;
         this.masa = masa;
-        //generujNazweKatalogowa();
+        this.nazwaKatalogowa = nazwaKatalogowa;
     }
 
     //GETTERS & SETTERS
@@ -193,62 +188,53 @@ public class Gwiazda  {
     }
 
     private String generujNazweKatalogowa(String gwiazdozbior) {
-        AlfabetGrecki litera = znajdzWolnaLitere(gwiazdozbior);
-        return litera + " " + gwiazdozbior;
-    }
+        try (Connection connection = DriverManager.getConnection(sciezka)) {
+            WyszukiwarkaGwiazd wyszukiwarka = new WyszukiwarkaGwiazd(connection);
 
-    private AlfabetGrecki znajdzWolnaLitere(String gwiazdozbior) {
-        AlfabetGrecki[] alfabet = AlfabetGrecki.values();
-        zajeteLitery = wczytajZajeteLitery();
+            List<String> wyniki = wyszukiwarka.wyszukajWGwiazdozbiorzeLista(gwiazdozbior);
+            List<String> przetworzoneWyniki = przetworzListe(wyniki);
 
-        if (zajeteLitery.containsValue(gwiazdozbior)) {
-            for (AlfabetGrecki litera : alfabet) {
-                if (!zajeteLitery.containsKey(litera)) {
-                    zajeteLitery.put(litera, gwiazdozbior);
-                    zapiszZajeteLitery();
-                    return litera;
-                }
-            }
-        } else {
-            for (AlfabetGrecki litera : alfabet) {
-                if (!zajeteLitery.containsKey(litera)) {
-                    zajeteLitery.put(litera, gwiazdozbior);
-                    zapiszZajeteLitery();
-                    return litera;
-                }
-            }
-        }
+            AlfabetGrecki wolnaLitera = znajdzWolnaLitere(przetworzoneWyniki);
 
-        throw new IllegalStateException("Nie można znaleźć wolnego symbolu w alfabecie greckim.");
-    }
-
-    private static HashMap<AlfabetGrecki, String> wczytajZajeteLitery() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(PLIK_ZAJETE_LITERY))) {
-            HashMap<AlfabetGrecki, String> zajeteLiteryMapa = new HashMap<>();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.trim().split(" ");
-                if (parts.length == 2) {
-                    AlfabetGrecki litera = AlfabetGrecki.valueOf(parts[0]);
-                    String gwiazdozbior = parts[1];
-                    zajeteLiteryMapa.put(litera, gwiazdozbior);
-                }
-            }
-            return zajeteLiteryMapa;
-        } catch (IOException e) {
-            return new HashMap<>();
+            return generujNowaNazweKatalogowa(wolnaLitera, gwiazdozbior);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private void zapiszZajeteLitery() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(PLIK_ZAJETE_LITERY, false))) {
-            for (HashMap.Entry<AlfabetGrecki, String> entry : zajeteLitery.entrySet()) {
-                writer.write(entry.getKey().toString() + " " + entry.getValue());
-                writer.newLine();
+    private String generujNowaNazweKatalogowa(AlfabetGrecki wolnaLitera, String gwiazdozbior) {
+        return wolnaLitera + " " + gwiazdozbior;
+    }
+
+    public List<String> przetworzListe(List<String> wyniki) {
+        List<String> przetworzoneWyniki = new ArrayList<>();
+
+        for (String wynik : wyniki) {
+            String[] podzielone = wynik.split(" ", 2);
+            if (podzielone.length > 0) {
+                przetworzoneWyniki.add(podzielone[0]);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        return przetworzoneWyniki;
+    }
+
+    public static AlfabetGrecki znajdzWolnaLitere(List<String> przetworzoneWyniki) {
+        for (AlfabetGrecki litera : AlfabetGrecki.values()) {
+            if (!czyLiteraWystepuje(przetworzoneWyniki, litera)) {
+                return litera;
+            }
+        }
+        throw new IllegalArgumentException("Wszystkie litery zostały już użyte.");
+    }
+
+    private static boolean czyLiteraWystepuje(List<String> przetworzoneWyniki, AlfabetGrecki litera) {
+        String literaAsString = litera.name();
+        for (String wynik : przetworzoneWyniki) {
+            if (wynik.startsWith(literaAsString)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void aktualizujBazeDanych(Gwiazda gwiazda) {
@@ -297,8 +283,9 @@ public class Gwiazda  {
                 int deletedRows = preparedStatement.executeUpdate();
 
                 if (deletedRows > 0) {
-                    zajeteLitery.remove(gwiazdaDoUsuniecia.getGwiazdozbior());
-                    zapiszZajeteLitery();
+                    System.out.println("Usunięto gwiazdę " + gwiazdaDoUsuniecia.getNazwa());
+                } else {
+                    System.out.println("Nie znaleziono gwiazdy " + gwiazdaDoUsuniecia.getNazwa());
                 }
             }
         } catch (SQLException e) {

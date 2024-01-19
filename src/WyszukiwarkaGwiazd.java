@@ -2,6 +2,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WyszukiwarkaGwiazd {
     private Connection connection;
@@ -13,6 +15,11 @@ public class WyszukiwarkaGwiazd {
     public void wyszukajWGwiazdozbiorze(String gwiazdozbior) {
         String sql = "SELECT * FROM gwiazdy WHERE gwiazdozbior = ?";
         wyszukajIWyswietl(sql, gwiazdozbior);
+    }
+
+    public List<String> wyszukajWGwiazdozbiorzeLista(String gwiazdozbior) {
+        String sql = "SELECT * FROM gwiazdy WHERE gwiazdozbior = ?";
+        return wyszukajIWyswietlListe(sql, gwiazdozbior);
     }
 
     public void wyszukajWedlugOdleglosci(double odlegloscWParskach) {
@@ -58,6 +65,25 @@ public class WyszukiwarkaGwiazd {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public List<String> wyszukajIWyswietlListe(String sql, String... parametry) {
+        List<String> listaGwiazd = new ArrayList<>();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            for (int i = 0; i < parametry.length; i++) {
+                statement.setString(i + 1, parametry[i]);
+            }
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    String wartosc = resultSet.getString("nazwaKatalogowa");
+                    listaGwiazd.add(wartosc);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return listaGwiazd;
     }
 
     public void wyswietlDaneGwiazdy(ResultSet resultSet, int numerGwiazdy) throws SQLException {
