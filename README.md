@@ -3,9 +3,7 @@
 
 *<font color =  "lightblue">
 Sidenote: Things for Future Improvements*
-- *Constellation naming logic*
-- *Deletion logic*
-- *Additional conditions and checks*
+- *Constellation naming logic: the program has to iterate through the Greek alphabet letters anew everytime a new constellation is introduced.*
 </font>
 
 ## Class: Star

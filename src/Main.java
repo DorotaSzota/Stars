@@ -7,9 +7,9 @@ public class Main {
     public static void main(String[] args) {
 
         Gwiazda gwiazda1 = new Gwiazda("ELO2137", "PN","12°34'56\"", "1h23m45s",10.2, 0.5,
-                 "Gwiazdozbior1", 3000, 2.5);
+                "Gwiazdozbior1", 3000, 2.5);
         Gwiazda gwiazda2 = new Gwiazda("HEJ0420", "PN","45°30'15\"", "3h15m20s",-21.7, 11,
-                 "Gwiazdozbior1",  4000, 3.8);
+                "Gwiazdozbior1",  4000, 3.8);
         Gwiazda gwiazda3 = new Gwiazda("WOW0420", "PN", "40°30'15\"", "2h15m20s",14.7, 13,
                 "Gwiazdozbior1",  2800, 1.99);
         Gwiazda gwiazda4 = new Gwiazda("GWI0001", "PN","10°30'15\"", "7h15m20s",9.03, 25,
@@ -38,5 +38,4 @@ public class Main {
     }
 
 
-    }
-
+}
