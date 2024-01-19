@@ -3,7 +3,7 @@
 
 *<font color =  "lightblue">
 Sidenote: Things for Future Improvements*
-- *Constellation naming logic: the program has to iterate through the Greek alphabet letters anew everytime a new constellation is introduced. Perhaps a new table can be introduced in the DB with pairs.*
+- *Constellation naming logic: the program has to iterate through the Greek alphabet letters anew everytime a new constellation is introduced. Perhaps a new table can be introduced in the DB.*
 </font>
 
 ## Class: Star
