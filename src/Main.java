@@ -26,7 +26,7 @@ public class Main {
 
 
 //        gwiazda.usunGwiazdeZBazy(gwiazda1);
-//        gwiazda.usunGwiazdeZBazy(gwiazda2);
+        gwiazda.usunGwiazdeZBazy(gwiazda2);
 //        gwiazda.usunGwiazdeZBazy(gwiazda3);
 //        gwiazda.usunGwiazdeZBazy(gwiazda4);
 //        gwiazda.usunGwiazdeZBazy(gwiazda5);
